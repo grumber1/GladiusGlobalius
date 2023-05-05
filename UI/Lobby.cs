@@ -43,8 +43,7 @@ public class Lobby : MonoBehaviour
         MultiplayerManagerClient.connectedPlayers.ForEach(
             (connectedPlayer) =>
             {
-                connectedPlayersString +=
-                    connectedPlayer.name + " " + connectedPlayer.ip + " " + ping;
+                connectedPlayersString += connectedPlayer.name + " " + ping;
             }
         );
         connectedPlayersText.text = connectedPlayersString;

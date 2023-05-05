@@ -7,7 +7,7 @@ public class Player
 {
     public int id;
     public string name;
-    public string ip;
+    public NetworkPlayerData networkPlayerData;
 
     // public Buildings buildings = new Buildings();
     // public Crew crew = new Crew();
@@ -15,10 +15,10 @@ public class Player
     public Player() { }
 
     //Constructor
-    public Player(int newId, string newName, string newIp)
+    public Player(int newId, string newName, NetworkPlayerData newNetworkPlayerData)
     {
         id = newId;
         name = newName;
-        ip = newIp;
+        networkPlayerData = newNetworkPlayerData;
     }
 }

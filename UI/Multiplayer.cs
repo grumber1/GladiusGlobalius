@@ -42,20 +42,19 @@ public class Multiplayer : MonoBehaviour
     {
         string ip = joinIps[joinIpDropdown.value];
         if (ip.Length == 0)
+            Debug.Log("ip: " + ip);
         {
-            ip = MyTCPServer.localIp;
+            string playerName = inputFieldPlayerName.text;
+            MultiplayerManagerClient.name = playerName;
+            MultiplayerManagerClient.remoteIp = ip;
+            MyTcpClient.TCPClient(ip);
+
+            MyTcpClient.sendToNetwork(
+                "MultiplayerManager::::::connectedPlayers:::::addNewPlayer::::" + playerName
+            );
+            // TODO evtl mehr Daten mitschicken? Ip, etc..
+            Methods.switchScreen(MultiplayerGO, LobbyGO);
         }
-
-        string playerName = inputFieldPlayerName.text;
-        MultiplayerManagerClient.name = playerName;
-        MultiplayerManagerClient.remoteIp = ip;
-
-        MyTcpClient.TCPClient(ip);
-        MyTcpClient.sendToNetwork(
-            "MultiplayerManager::::::connectedPlayers:::::Add::::" + playerName + ":::::::"
-        );
-        // TODO evtl mehr Daten mitschicken? Ip, etc..
-        Methods.switchScreen(MultiplayerGO, LobbyGO);
     }
 
     public void onClickRefresh()

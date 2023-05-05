@@ -11,9 +11,9 @@ public static class MyTcpClient
     public static void TCPClient(string ip)
     {
         Int32 port = DevSettings.port;
-        TcpClient client = new TcpClient(ip, port);
-        Stream stream = client.GetStream();
-        MultiplayerManagerClient.stream = stream;
+        TcpClient clientToServerClient = new TcpClient(ip, port);
+        Stream clientToServerStream = clientToServerClient.GetStream();
+        MultiplayerManagerClient.clientToServerStream = clientToServerStream;
         Debug.Log("Client Thread: Received Stream");
 
         startReadIncomingNetworkTrafficThread();
@@ -22,9 +22,8 @@ public static class MyTcpClient
 
     public static void sendToNetwork(string message)
     {
-        //Debug.Log("MyTcpClient: sent data: " + message);
         Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
-        MultiplayerManagerClient.stream.Write(data, 0, data.Length);
+        MultiplayerManagerClient.clientToServerStream.Write(data, 0, data.Length);
     }
 
     private static void startReadIncomingNetworkTrafficThread()
@@ -46,7 +45,7 @@ public static class MyTcpClient
             while (true)
             {
                 Byte[] decodeData = new Byte[1024];
-                Int32 streamBytes = MultiplayerManagerClient.stream.Read(
+                Int32 streamBytes = MultiplayerManagerClient.clientToServerStream.Read(
                     decodeData,
                     0,
                     decodeData.Length
@@ -63,9 +62,15 @@ public static class MyTcpClient
         finally
         {
             Debug.Log("Client Error");
-            sendToNetwork("disconnected: " + MultiplayerManagerClient.name);
-            MultiplayerManagerClient.stream.Close();
-            MultiplayerManagerClient.client.Close();
+            string convertedMessage = Methods.convertMessage(
+                "MultiplayerManagerServer",
+                "connectedPlayers",
+                "disconnectPlayer",
+                MultiplayerManagerClient.id.ToString()
+            );
+            sendToNetwork(convertedMessage);
+            MultiplayerManagerClient.clientToServerStream.Close();
+            MultiplayerManagerClient.clientToServerClient.Close();
         }
     }
 }

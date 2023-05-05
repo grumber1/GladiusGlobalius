@@ -15,11 +15,11 @@ public static class TCPMessageHandlerClient
             (string classToCall, string objectToCall, string method, string value) =
                 Methods.resolveMessage(classObjectMethodValue);
 
-            handleMsg(classToCall, objectToCall, method, value);
+            handlePayload(classToCall, objectToCall, method, value);
         }
     }
 
-    private static void handleMsg(
+    private static void handlePayload(
         string classToCall,
         string objectToCall,
         string method,
@@ -36,8 +36,6 @@ public static class TCPMessageHandlerClient
 
     private static void multiplayerManager(string objectToCall, string method, string value)
     {
-        // Class:Object:Method:Value::::
-        // MultiplayerManager:connectedPlayers:Add:saf::::
         switch (objectToCall)
         {
             case "connectedPlayers":
@@ -60,6 +58,9 @@ public static class TCPMessageHandlerClient
                         );
 
                         MultiplayerManagerClient.connectedPlayers = connectedPlayers;
+                        MultiplayerManagerClient.connectedPlayer = connectedPlayers[
+                            MultiplayerManagerClient.id
+                        ];
                     }
             }
         }

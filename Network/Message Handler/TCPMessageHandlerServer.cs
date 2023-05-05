@@ -2,6 +2,8 @@ using UnityEngine;
 using TMPro;
 using System;
 using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 public static class TCPMessageHandlerServer
 {
@@ -21,13 +23,7 @@ public static class TCPMessageHandlerServer
                 (string classToCall, string objectToCall, string method, string value) =
                     Methods.resolveMessage(classObjectMethodValue);
 
-                Debug.Log("Server: handle Message: " + classObjectMethodValue); // MultiplayerManager:connectedPlayers:Add:saf
-                Debug.Log("Server: handle classToCall: " + classToCall); // MultiplayerManager
-                Debug.Log("Server: handle objectToCall: " + objectToCall); // connectedPlayers
-                Debug.Log("Server: handle method: " + method); // Add
-                Debug.Log("Server: handle value: " + value);
-
-                handleMsg(classToCall, objectToCall, method, value);
+                handlePayload(classToCall, objectToCall, method, value);
 
                 outgoingMessages += outgoingMessage + "::::";
             }
@@ -36,7 +32,7 @@ public static class TCPMessageHandlerServer
         return outgoingMessages;
     }
 
-    private static void handleMsg(
+    private static void handlePayload(
         string classToCall,
         string objectToCall,
         string method,
@@ -53,8 +49,6 @@ public static class TCPMessageHandlerServer
 
     private static void multiplayerManager(string objectToCall, string method, string value)
     {
-        // Class:Object:Method:Value::::
-        // MultiplayerManager:connectedPlayers:Add:saf::::
         switch (objectToCall)
         {
             case "connectedPlayers":
@@ -66,20 +60,34 @@ public static class TCPMessageHandlerServer
         {
             switch (method)
             {
-                case "Add":
-                    addConnectedPlayersServer(value);
+                case "addNewPlayer":
+                    addNewPlayer(value);
                     break;
 
-                    static void addConnectedPlayersServer(string value)
+                case "disconnect":
+                    disconnectPlayer(value);
+                    break;
+
+                    static void addNewPlayer(string newPlayerName)
                     {
-                        string playerName = value;
-                        int playerIndex = MultiplayerManagerServer.connectedPlayers
+                        int newPlayerId = MultiplayerManagerServer.connectedPlayers
                             .ToArray()
                             .Length;
-                        IPAddress playerIp = MyTCPServer.connectedIpAddresses[playerIndex];
-                        string playerIpString = playerIp.ToString();
 
-                        Player newPlayer = new Player(playerIndex, playerName, playerIpString);
+                        IPAddress newPlayerIp = MultiplayerManagerServer.connectedIpAddresses[
+                            newPlayerId
+                        ];
+                        string newPlayerIpString = newPlayerIp.ToString();
+
+                        NetworkPlayerData newNetworkPlayerData = new NetworkPlayerData(
+                            newPlayerIpString
+                        );
+
+                        Player newPlayer = new Player(
+                            newPlayerId,
+                            newPlayerName,
+                            newNetworkPlayerData
+                        );
 
                         MultiplayerManagerServer.connectedPlayers.Add(newPlayer);
                         string serializedConnectedPlayers = Methods.SerializeObject(
@@ -87,7 +95,32 @@ public static class TCPMessageHandlerServer
                         );
                         string outgoingMessageWithoutValue =
                             "MultiplayerManager::::::connectedPlayers:::::updateConnectedPlayers::::";
-                        outgoingMessage += outgoingMessageWithoutValue + serializedConnectedPlayers;
+                        outgoingMessage = outgoingMessageWithoutValue + serializedConnectedPlayers;
+                    }
+
+                    static void disconnectPlayer(string id)
+                    {
+                        int i = 0;
+                        MultiplayerManagerServer.connectedPlayers.ForEach(connectedPlayer =>
+                        {
+                            if (connectedPlayer.id.ToString() == id)
+                            {
+                                MultiplayerManagerServer.connectedPlayers.RemoveAt(i);
+                                MultiplayerManagerServer.serverToClientClients.RemoveAt(i);
+                                MultiplayerManagerServer.serverToClientStreams.RemoveAt(i);
+
+                                string serializedConnectedPlayers = Methods.SerializeObject(
+                                    MultiplayerManagerServer.connectedPlayers
+                                );
+                                string outgoingMessageWithoutValue =
+                                    "MultiplayerManager::::::connectedPlayers:::::updateConnectedPlayers::::";
+                                outgoingMessage =
+                                    outgoingMessageWithoutValue + serializedConnectedPlayers;
+
+                                return;
+                            }
+                            i++;
+                        });
                     }
             }
         }

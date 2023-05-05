@@ -9,7 +9,6 @@ public static class MyTCPServer
 {
     static TcpListener server = null;
     static Boolean acceptNewConnections = true;
-    public static List<IPAddress> connectedIpAddresses = new List<IPAddress>();
     static Thread clientHandlingThread;
     public static string localIp;
     public static bool serverWaitingForNewConnections = true;
@@ -78,11 +77,11 @@ public static class MyTCPServer
     {
         byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
         int i = 0;
-        MultiplayerManagerServer.streams.ForEach(stream =>
+        MultiplayerManagerServer.serverToClientStreams.ForEach(serverToClientStream =>
         {
-            if (MultiplayerManagerServer.clients[i].Connected)
+            if (MultiplayerManagerServer.serverToClientClients[i].Connected)
             {
-                stream.Write(msg, 0, msg.Length);
+                serverToClientStream.Write(msg, 0, msg.Length);
             }
             i += 1;
         });
@@ -109,27 +108,29 @@ public static class MyTCPServer
             addTextToServerConsole("Server: Waiting for new connection...");
             Debug.Log("Server: Waiting for new connection...");
 
-            TcpClient client = server.AcceptTcpClient();
-            MultiplayerManagerServer.clients.Add(client);
+            TcpClient serverToClientClient = server.AcceptTcpClient();
+            MultiplayerManagerServer.serverToClientClients.Add(serverToClientClient);
             acceptNewConnections = true;
 
             addTextToServerConsole("Server: Client Connected!");
             Debug.Log("Server: Client Connected!");
 
-            NetworkStream stream = client.GetStream();
-            MultiplayerManagerServer.streams.Add(stream);
+            NetworkStream serverToClientStream = serverToClientClient.GetStream();
+            MultiplayerManagerServer.serverToClientStreams.Add(serverToClientStream);
 
-            IPAddress connectedIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
-            connectedIpAddresses.Add(connectedIp);
+            IPAddress connectedIp = (
+                (IPEndPoint)serverToClientClient.Client.RemoteEndPoint
+            ).Address;
+            MultiplayerManagerServer.connectedIpAddresses.Add(connectedIp);
 
             Debug.Log("Server: Client Added!");
-            Boolean clientConnected = client.Connected;
+            Boolean clientConnected = serverToClientClient.Connected;
             while (clientConnected)
             {
-                if (stream.DataAvailable)
+                if (serverToClientStream.DataAvailable)
                 {
                     //Debug.Log("Server: Stream Data available");
-                    String receivedMessage = receiveMessage(stream);
+                    String receivedMessage = receiveMessage(serverToClientStream);
                     Debug.Log("Server: received Message: " + receivedMessage);
                     string messageToSend = TCPMessageHandlerServer.handleMessage(receivedMessage);
                     sendMessage(messageToSend);
@@ -137,11 +138,11 @@ public static class MyTCPServer
                 }
                 else
                 {
-                    clientConnected = client.Connected;
+                    clientConnected = serverToClientClient.Connected;
                 }
             }
             Debug.Log("disconnecting Client");
-            client.Close();
+            serverToClientClient.Close();
             server.Stop();
         }
         finally

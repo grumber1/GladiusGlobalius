@@ -128,4 +128,17 @@ public static class Methods
 
         return (classToCall: classToCall, objectToCall: objectToCall, method: method, value: value);
     }
+
+    public static string convertMessage(
+        string classToCall,
+        string objectToCall,
+        string method,
+        string value
+    )
+    {
+        string convertedMessage =
+            classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
+
+        return convertedMessage;
+    }
 }
