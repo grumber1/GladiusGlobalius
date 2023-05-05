@@ -7,6 +7,7 @@ using TMPro;
 
 public static class MultiplayerManagerClient
 {
+    public static TcpClient client;
     public static Stream stream;
     public static int id;
     public static string name;

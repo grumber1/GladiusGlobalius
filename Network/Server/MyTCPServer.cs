@@ -36,10 +36,6 @@ public static class MyTCPServer
                 }
             }
         }
-        catch
-        {
-            stopChildThread();
-        }
         finally
         {
             stopChildThread();
@@ -95,6 +91,7 @@ public static class MyTCPServer
     private static void startClientHandlingThread()
     {
         ThreadStart clientHandlingRef = new ThreadStart(CallClientHandlingThread);
+
         clientHandlingThread = new Thread(clientHandlingRef);
         clientHandlingThread.Start();
     }
@@ -108,56 +105,48 @@ public static class MyTCPServer
     {
         try
         {
-            Boolean clientConnected = true;
+            Debug.Log("Server Thread: ClientHandling started");
+            addTextToServerConsole("Server: Waiting for new connection...");
+            Debug.Log("Server: Waiting for new connection...");
+
+            TcpClient client = server.AcceptTcpClient();
+            MultiplayerManagerServer.clients.Add(client);
+            acceptNewConnections = true;
+
+            addTextToServerConsole("Server: Client Connected!");
+            Debug.Log("Server: Client Connected!");
+
+            NetworkStream stream = client.GetStream();
+            MultiplayerManagerServer.streams.Add(stream);
+
+            IPAddress connectedIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
+            connectedIpAddresses.Add(connectedIp);
+
+            Debug.Log("Server: Client Added!");
+            Boolean clientConnected = client.Connected;
             while (clientConnected)
             {
-                Debug.Log("Server Thread: ClientHandling started");
-                addTextToServerConsole("Server: Waiting for new connection...");
-                Debug.Log("Server: Waiting for new connection...");
-
-                TcpClient client = server.AcceptTcpClient();
-                MultiplayerManagerServer.clients.Add(client);
-                acceptNewConnections = true;
-
-                addTextToServerConsole("Server: Client Connected!");
-                Debug.Log("Server: Client Connected!");
-
-                NetworkStream stream = client.GetStream();
-                MultiplayerManagerServer.streams.Add(stream);
-
-                IPAddress connectedIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
-                connectedIpAddresses.Add(connectedIp);
-
-                Debug.Log("Server: Client Added!");
-                clientConnected = client.Connected;
-                while (clientConnected)
+                if (stream.DataAvailable)
                 {
-                    if (stream.DataAvailable)
-                    {
-                        //Debug.Log("Server: Stream Data available");
-                        String receivedMessage = receiveMessage(stream);
-                        Debug.Log("Server: received Message: " + receivedMessage);
-                        string messageToSend = TCPMessageHandlerServer.handleMessage(
-                            receivedMessage
-                        );
-                        sendMessage(messageToSend);
-                        Debug.Log("Server: sent Message: " + messageToSend);
-                    }
-                    else
-                    {
-                        clientConnected = client.Connected;
-                    }
+                    //Debug.Log("Server: Stream Data available");
+                    String receivedMessage = receiveMessage(stream);
+                    Debug.Log("Server: received Message: " + receivedMessage);
+                    string messageToSend = TCPMessageHandlerServer.handleMessage(receivedMessage);
+                    sendMessage(messageToSend);
+                    Debug.Log("Server: sent Message: " + messageToSend);
                 }
-                server.Stop();
+                else
+                {
+                    clientConnected = client.Connected;
+                }
             }
-        }
-        catch
-        {
-            Debug.Log("Server: ChildThread stopped");
-            stopChildThread();
+            Debug.Log("disconnecting Client");
+            client.Close();
+            server.Stop();
         }
         finally
         {
+            Debug.Log("Server: ChildThread stopped");
             stopChildThread();
         }
     }

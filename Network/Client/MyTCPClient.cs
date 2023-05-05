@@ -60,6 +60,12 @@ public static class MyTcpClient
                 TCPMessageHandlerClient.handleMessage(receivedMessage);
             }
         }
-        catch { }
+        finally
+        {
+            Debug.Log("Client Error");
+            sendToNetwork("disconnected: " + MultiplayerManagerClient.name);
+            MultiplayerManagerClient.stream.Close();
+            MultiplayerManagerClient.client.Close();
+        }
     }
 }
