@@ -63,7 +63,7 @@ public static class MyTcpClient
         {
             Debug.Log("Client Error");
             string convertedMessage = Methods.convertMessage(
-                "MultiplayerManagerServer",
+                "MultiplayerManager",
                 "connectedPlayers",
                 "disconnectPlayer",
                 MultiplayerManagerClient.id.ToString()

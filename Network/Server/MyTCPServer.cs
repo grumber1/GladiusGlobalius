@@ -73,17 +73,21 @@ public static class MyTCPServer
         return receivedMessage;
     }
 
-    private static void sendMessage(String message)
+    public static void sendMessage(String message)
     {
         byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
         int i = 0;
+        Debug.Log("TCPServer: Trying to send message with " + msg.Length + " bytes: " + message);
+        addTextToServerConsole(
+            "TCPServer: Trying to send message with " + msg.Length + " bytes: " + message
+        );
         MultiplayerManagerServer.serverToClientStreams.ForEach(serverToClientStream =>
         {
             if (MultiplayerManagerServer.serverToClientClients[i].Connected)
             {
                 serverToClientStream.Write(msg, 0, msg.Length);
             }
-            i += 1;
+            i++;
         });
     }
 
@@ -132,9 +136,16 @@ public static class MyTCPServer
                     //Debug.Log("Server: Stream Data available");
                     String receivedMessage = receiveMessage(serverToClientStream);
                     Debug.Log("Server: received Message: " + receivedMessage);
+                    addTextToServerConsole("Server: received Message: " + receivedMessage);
                     string messageToSend = TCPMessageHandlerServer.handleMessage(receivedMessage);
+
+                    // Boolean isForwardMessage = checkIfForwardMessage(receivedMessage);
+                    // if (isForwardMessage)
+                    // {
                     sendMessage(messageToSend);
                     Debug.Log("Server: sent Message: " + messageToSend);
+                    addTextToServerConsole("Server: sent Message: " + messageToSend);
+                    //}
                 }
                 else
                 {
@@ -152,9 +163,42 @@ public static class MyTCPServer
         }
     }
 
+    private static Boolean checkIfForwardMessage(string receivedMessage)
+    {
+        Boolean isForwardMessage = true;
+
+        string[] messages = receivedMessage.Split(":::::::");
+        foreach (string classObjectMethodValue in messages)
+            if (classObjectMethodValue != "")
+            {
+                (string classToCall, string objectToCall, string method, string value) =
+                    Methods.resolveMessage(classObjectMethodValue);
+
+                if (method == "disconnectPlayer")
+                {
+                    isForwardMessage = false;
+                }
+            }
+
+        return isForwardMessage;
+    }
+
     private static void addTextToServerConsole(string newContent)
     {
         newContent += "\n";
         content = content + newContent;
+        string[] contentSplit = content.Split("\n");
+        int contentLines = content.Split("\n").Length;
+        int maxLines = 30;
+        if (contentLines > maxLines)
+        {
+            int tooManyLines = contentLines - maxLines;
+            content = "";
+
+            for (int i = tooManyLines; i < contentLines; i++)
+            {
+                content += contentSplit[i];
+            }
+        }
     }
 }

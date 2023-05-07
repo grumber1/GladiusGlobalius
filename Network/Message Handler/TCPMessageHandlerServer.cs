@@ -64,7 +64,7 @@ public static class TCPMessageHandlerServer
                     addNewPlayer(value);
                     break;
 
-                case "disconnect":
+                case "disconnectPlayer":
                     disconnectPlayer(value);
                     break;
 
@@ -94,33 +94,38 @@ public static class TCPMessageHandlerServer
                             MultiplayerManagerServer.connectedPlayers
                         );
                         string outgoingMessageWithoutValue =
-                            "MultiplayerManager::::::connectedPlayers:::::updateConnectedPlayers::::";
+                            "MultiplayerManager::::::connectedPlayers:::::addNewPlayer::::";
                         outgoingMessage = outgoingMessageWithoutValue + serializedConnectedPlayers;
                     }
 
                     static void disconnectPlayer(string id)
                     {
+                        int indexPlayerToDisconnect = 0;
                         int i = 0;
                         MultiplayerManagerServer.connectedPlayers.ForEach(connectedPlayer =>
                         {
                             if (connectedPlayer.id.ToString() == id)
                             {
-                                MultiplayerManagerServer.connectedPlayers.RemoveAt(i);
-                                MultiplayerManagerServer.serverToClientClients.RemoveAt(i);
-                                MultiplayerManagerServer.serverToClientStreams.RemoveAt(i);
-
-                                string serializedConnectedPlayers = Methods.SerializeObject(
-                                    MultiplayerManagerServer.connectedPlayers
-                                );
-                                string outgoingMessageWithoutValue =
-                                    "MultiplayerManager::::::connectedPlayers:::::updateConnectedPlayers::::";
-                                outgoingMessage =
-                                    outgoingMessageWithoutValue + serializedConnectedPlayers;
+                                indexPlayerToDisconnect = i;
 
                                 return;
                             }
                             i++;
                         });
+                        MultiplayerManagerServer.connectedPlayers.RemoveAt(indexPlayerToDisconnect);
+                        MultiplayerManagerServer.serverToClientClients.RemoveAt(
+                            indexPlayerToDisconnect
+                        );
+                        MultiplayerManagerServer.serverToClientStreams.RemoveAt(
+                            indexPlayerToDisconnect
+                        );
+                        string connectedPlayersSerializedString = Methods.SerializeObject(
+                            MultiplayerManagerServer.connectedPlayers
+                        );
+                        string outgoingMessageWithoutValue =
+                            "MultiplayerManager::::::connectedPlayers:::::syncConnectedPlayers::::";
+                        outgoingMessage =
+                            outgoingMessageWithoutValue + connectedPlayersSerializedString;
                     }
             }
         }

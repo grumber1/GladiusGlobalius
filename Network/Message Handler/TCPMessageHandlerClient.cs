@@ -41,26 +41,56 @@ public static class TCPMessageHandlerClient
             case "connectedPlayers":
                 connectedPlayers(method, value);
                 break;
+
+            case "startGameButton":
+                startGameButton(method, value);
+                break;
         }
 
         static void connectedPlayers(string method, string value)
         {
             switch (method)
             {
-                case "updateConnectedPlayers":
-                    updateConnectedPlayers(value);
+                case "addNewPlayer":
+                    addNewPlayer(value);
                     break;
 
-                    static void updateConnectedPlayers(string value)
+                case "syncConnectedPlayers":
+                    syncConnectedPlayers(value);
+                    break;
+
+                    static void addNewPlayer(string connectedPlayersSerializedString)
+                    {
+                        syncConnectedPlayers(connectedPlayersSerializedString);
+                        MultiplayerManagerClient.connectedPlayer =
+                            MultiplayerManagerClient.connectedPlayers[MultiplayerManagerClient.id];
+                    }
+
+                    static void syncConnectedPlayers(string connectedPlayersSerializedString)
                     {
                         List<Player> connectedPlayers = Methods.DeserializeObject<List<Player>>(
-                            value
+                            connectedPlayersSerializedString
                         );
 
                         MultiplayerManagerClient.connectedPlayers = connectedPlayers;
-                        MultiplayerManagerClient.connectedPlayer = connectedPlayers[
-                            MultiplayerManagerClient.id
-                        ];
+                    }
+            }
+        }
+
+        static void startGameButton(string method, string value)
+        {
+            switch (method)
+            {
+                case "set":
+                    set(value);
+                    break;
+
+                    static void set(string value)
+                    {
+                        if (value == "true")
+                        {
+                            MultiplayerManagerClient.startGameButton = true;
+                        }
                     }
             }
         }

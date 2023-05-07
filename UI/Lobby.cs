@@ -8,16 +8,11 @@ public class Lobby : MonoBehaviour
 {
     public GameObject LobbyGO;
     public GameObject GameGO;
-
     public TMP_Text connectedPlayersText;
-    public Button StartGameButton;
 
     void Start()
     {
-        if (!MultiplayerManagerClient.isServer)
-        {
-            StartGameButton.interactable = false;
-        }
+        MultiplayerManagerClient.startGameButton = false;
     }
 
     void Update()
@@ -25,15 +20,8 @@ public class Lobby : MonoBehaviour
         updateConnectedPlayers();
         if (MultiplayerManagerClient.startGameButton == true)
         {
-            MyTCPServer.serverWaitingForNewConnections = false;
             Methods.switchScreen(LobbyGO, GameGO);
         }
-    }
-
-    public void onClickStartGame()
-    {
-        MyTcpClient.sendToNetwork("MultiplayerManager.startGameButton.set;" + "true" + "$$$");
-        Methods.switchScreen(LobbyGO, GameGO);
     }
 
     private void updateConnectedPlayers()
@@ -43,7 +31,7 @@ public class Lobby : MonoBehaviour
         MultiplayerManagerClient.connectedPlayers.ForEach(
             (connectedPlayer) =>
             {
-                connectedPlayersString += connectedPlayer.name + " " + ping;
+                connectedPlayersString += connectedPlayer.name + " " + ping + "\n";
             }
         );
         connectedPlayersText.text = connectedPlayersString;
