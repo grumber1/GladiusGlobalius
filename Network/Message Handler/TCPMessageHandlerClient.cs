@@ -51,20 +51,9 @@ public static class TCPMessageHandlerClient
         {
             switch (method)
             {
-                case "addNewPlayer":
-                    addNewPlayer(value);
-                    break;
-
                 case "syncConnectedPlayers":
                     syncConnectedPlayers(value);
                     break;
-
-                    static void addNewPlayer(string connectedPlayersSerializedString)
-                    {
-                        syncConnectedPlayers(connectedPlayersSerializedString);
-                        MultiplayerManagerClient.connectedPlayer =
-                            MultiplayerManagerClient.connectedPlayers[MultiplayerManagerClient.id];
-                    }
 
                     static void syncConnectedPlayers(string connectedPlayersSerializedString)
                     {
@@ -73,6 +62,11 @@ public static class TCPMessageHandlerClient
                         );
 
                         MultiplayerManagerClient.connectedPlayers = connectedPlayers;
+
+                        Player playerById = Methods.getPlayerByIdClient(
+                            MultiplayerManagerClient.player.id
+                        );
+                        MultiplayerManagerClient.player = playerById;
                     }
             }
         }

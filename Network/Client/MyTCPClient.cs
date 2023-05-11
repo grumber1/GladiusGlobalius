@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-public static class MyTcpClient
+public static class MyTCPClient
 {
     public static void TCPClient(string ip)
     {
@@ -20,10 +20,33 @@ public static class MyTcpClient
         Debug.Log("Client Thread: ReadIncomingNetworkTraffic started");
     }
 
-    public static void sendToNetwork(string message)
+    public static void sendMessageToServer(
+        string classToCall,
+        string objectToCall,
+        string method,
+        string value
+    )
     {
+        string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
+        message = message + ":::::::";
+
         Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
         MultiplayerManagerClient.clientToServerStream.Write(data, 0, data.Length);
+    }
+
+    public static void sendObjectToServer<T>(
+        string classToCall,
+        string objectToCall,
+        string method,
+        T objectToSerialize
+    )
+    {
+        string messageWithoutValue =
+            classToCall + "::::::" + objectToCall + ":::::" + method + "::::";
+
+        string serializedObject = Methods.SerializeObject(objectToSerialize);
+
+        MyTCPClient.sendMessageToServer(classToCall, objectToCall, method, serializedObject);
     }
 
     private static void startReadIncomingNetworkTrafficThread()
@@ -62,13 +85,13 @@ public static class MyTcpClient
         finally
         {
             Debug.Log("Client Error");
-            string convertedMessage = Methods.convertMessage(
+            MyTCPClient.sendMessageToServer(
                 "MultiplayerManager",
                 "connectedPlayers",
                 "disconnectPlayer",
-                MultiplayerManagerClient.id.ToString()
+                MultiplayerManagerClient.player.id
             );
-            sendToNetwork(convertedMessage);
+
             MultiplayerManagerClient.clientToServerStream.Close();
             MultiplayerManagerClient.clientToServerClient.Close();
         }

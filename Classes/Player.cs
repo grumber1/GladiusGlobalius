@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class Player
 {
-    public int id;
+    public string id;
     public string name;
-    public NetworkPlayerData networkPlayerData;
+    public string ip;
 
     // public Buildings buildings = new Buildings();
     // public Crew crew = new Crew();
@@ -15,10 +15,9 @@ public class Player
     public Player() { }
 
     //Constructor
-    public Player(int newId, string newName, NetworkPlayerData newNetworkPlayerData)
+    public Player(string newId, string newName)
     {
         id = newId;
         name = newName;
-        networkPlayerData = newNetworkPlayerData;
     }
 }

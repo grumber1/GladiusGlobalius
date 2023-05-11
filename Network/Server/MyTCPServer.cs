@@ -73,8 +73,16 @@ public static class MyTCPServer
         return receivedMessage;
     }
 
-    public static void sendMessage(String message)
+    public static void sendMessageToClients(
+        string classToCall,
+        string objectToCall,
+        string method,
+        string value
+    )
     {
+        string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
+        message = message + ":::::::";
+
         byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
         int i = 0;
         Debug.Log("TCPServer: Trying to send message with " + msg.Length + " bytes: " + message);
@@ -89,6 +97,24 @@ public static class MyTCPServer
             }
             i++;
         });
+
+        Debug.Log("Server: sent Message: " + message);
+        addTextToServerConsole("Server: sent Message: " + message);
+    }
+
+    public static void sendObjectToClients<T>(
+        string classToCall,
+        string objectToCall,
+        string method,
+        T objectToSerialize
+    )
+    {
+        string convertedMessageWithoutValue =
+            classToCall + "::::::" + objectToCall + ":::::" + method + "::::";
+
+        string serializedObject = Methods.SerializeObject(objectToSerialize);
+
+        MyTCPServer.sendMessageToClients(classToCall, objectToCall, method, serializedObject);
     }
 
     private static void startClientHandlingThread()
@@ -137,15 +163,7 @@ public static class MyTCPServer
                     String receivedMessage = receiveMessage(serverToClientStream);
                     Debug.Log("Server: received Message: " + receivedMessage);
                     addTextToServerConsole("Server: received Message: " + receivedMessage);
-                    string messageToSend = TCPMessageHandlerServer.handleMessage(receivedMessage);
-
-                    // Boolean isForwardMessage = checkIfForwardMessage(receivedMessage);
-                    // if (isForwardMessage)
-                    // {
-                    sendMessage(messageToSend);
-                    Debug.Log("Server: sent Message: " + messageToSend);
-                    addTextToServerConsole("Server: sent Message: " + messageToSend);
-                    //}
+                    TCPMessageHandlerServer.handleMessage(receivedMessage);
                 }
                 else
                 {
@@ -161,26 +179,6 @@ public static class MyTCPServer
             Debug.Log("Server: ChildThread stopped");
             stopChildThread();
         }
-    }
-
-    private static Boolean checkIfForwardMessage(string receivedMessage)
-    {
-        Boolean isForwardMessage = true;
-
-        string[] messages = receivedMessage.Split(":::::::");
-        foreach (string classObjectMethodValue in messages)
-            if (classObjectMethodValue != "")
-            {
-                (string classToCall, string objectToCall, string method, string value) =
-                    Methods.resolveMessage(classObjectMethodValue);
-
-                if (method == "disconnectPlayer")
-                {
-                    isForwardMessage = false;
-                }
-            }
-
-        return isForwardMessage;
     }
 
     private static void addTextToServerConsole(string newContent)

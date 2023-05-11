@@ -129,16 +129,34 @@ public static class Methods
         return (classToCall: classToCall, objectToCall: objectToCall, method: method, value: value);
     }
 
-    public static string convertMessage(
-        string classToCall,
-        string objectToCall,
-        string method,
-        string value
-    )
+    public static Player getPlayerByIdClient(string playerId)
     {
-        string convertedMessage =
-            classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
+        Player player = new Player();
+        MultiplayerManagerClient.connectedPlayers.ForEach(connectedPlayer =>
+        {
+            if (connectedPlayer.id == playerId)
+            {
+                player = connectedPlayer;
+            }
+        });
 
-        return convertedMessage;
+        return player;
+    }
+
+    public static int getPlayerIndexByPlayerIdServer(string playerId)
+    {
+        int i = 0;
+        int index = 0;
+        Player player = new Player();
+        MultiplayerManagerServer.connectedPlayers.ForEach(connectedPlayer =>
+        {
+            if (connectedPlayer.id == playerId)
+            {
+                index = i;
+            }
+            i++;
+        });
+
+        return index;
     }
 }

@@ -27,12 +27,6 @@ public class Server : MonoBehaviour
 
     public void onClickStartGame()
     {
-        string messageToSend = Methods.convertMessage(
-            "MultiplayerManager",
-            "startGameButton",
-            "set",
-            "true"
-        );
-        MyTCPServer.sendMessage(messageToSend);
+        MyTCPServer.sendMessageToClients("MultiplayerManager", "startGameButton", "set", "true");
     }
 }

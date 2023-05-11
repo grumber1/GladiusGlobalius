@@ -42,15 +42,22 @@ public class Multiplayer : MonoBehaviour
     {
         string ip = joinIps[joinIpDropdown.value];
         if (ip.Length == 0)
-            Debug.Log("ip: " + ip);
         {
-            string playerName = inputFieldPlayerName.text;
-            MultiplayerManagerClient.name = playerName;
+            Guid uniqueID = Guid.NewGuid();
             MultiplayerManagerClient.remoteIp = ip;
-            MyTcpClient.TCPClient(ip);
 
-            MyTcpClient.sendToNetwork(
-                "MultiplayerManager::::::connectedPlayers:::::addNewPlayer::::" + playerName
+            string newId = uniqueID.ToString();
+            string newPlayerName = inputFieldPlayerName.text;
+            Player newPlayer = new Player(newId, newPlayerName);
+            MultiplayerManagerClient.player = newPlayer;
+
+            MyTCPClient.TCPClient(ip);
+
+            MyTCPClient.sendObjectToServer(
+                "MultiplayerManager",
+                "connectedPlayers",
+                "addNewPlayer",
+                newPlayer
             );
             // TODO evtl mehr Daten mitschicken? Ip, etc..
             Methods.switchScreen(MultiplayerGO, LobbyGO);

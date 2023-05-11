@@ -7,29 +7,18 @@ using System.IO;
 
 public static class TCPMessageHandlerServer
 {
-    private static string outgoingMessage;
-    private static string outgoingMessages;
-
-    public static string handleMessage(string incomingMessages)
+    public static void handleMessage(string incomingMessages)
     {
         Debug.Log("Server: incomingMessages: " + incomingMessages);
-        outgoingMessages = "";
         string[] messages = incomingMessages.Split(":::::::");
         foreach (string classObjectMethodValue in messages)
             if (classObjectMethodValue != "")
             {
-                outgoingMessage = "";
-
                 (string classToCall, string objectToCall, string method, string value) =
                     Methods.resolveMessage(classObjectMethodValue);
 
                 handlePayload(classToCall, objectToCall, method, value);
-
-                outgoingMessages += outgoingMessage + "::::";
             }
-        Debug.Log("Server: Outgoing Messages: " + outgoingMessages);
-
-        return outgoingMessages;
     }
 
     private static void handlePayload(
@@ -68,64 +57,46 @@ public static class TCPMessageHandlerServer
                     disconnectPlayer(value);
                     break;
 
-                    static void addNewPlayer(string newPlayerName)
+                    static void addNewPlayer(string newPlayerSerialized)
                     {
-                        int newPlayerId = MultiplayerManagerServer.connectedPlayers
-                            .ToArray()
-                            .Length;
+                        Player newPlayer = Methods.DeserializeObject<Player>(newPlayerSerialized);
 
-                        IPAddress newPlayerIp = MultiplayerManagerServer.connectedIpAddresses[
-                            newPlayerId
-                        ];
-                        string newPlayerIpString = newPlayerIp.ToString();
-
-                        NetworkPlayerData newNetworkPlayerData = new NetworkPlayerData(
-                            newPlayerIpString
-                        );
-
-                        Player newPlayer = new Player(
-                            newPlayerId,
-                            newPlayerName,
-                            newNetworkPlayerData
-                        );
+                        string newlyConnectedIp = MultiplayerManagerServer.connectedIpAddresses[
+                            0
+                        ].ToString();
+                        newPlayer.ip = newlyConnectedIp;
+                        MultiplayerManagerServer.connectedIpAddresses.Clear();
 
                         MultiplayerManagerServer.connectedPlayers.Add(newPlayer);
-                        string serializedConnectedPlayers = Methods.SerializeObject(
-                            MultiplayerManagerServer.connectedPlayers
-                        );
-                        string outgoingMessageWithoutValue =
-                            "MultiplayerManager::::::connectedPlayers:::::addNewPlayer::::";
-                        outgoingMessage = outgoingMessageWithoutValue + serializedConnectedPlayers;
-                    }
-
-                    static void disconnectPlayer(string id)
-                    {
-                        int indexPlayerToDisconnect = 0;
-                        int i = 0;
-                        MultiplayerManagerServer.connectedPlayers.ForEach(connectedPlayer =>
-                        {
-                            if (connectedPlayer.id.ToString() == id)
-                            {
-                                indexPlayerToDisconnect = i;
-
-                                return;
-                            }
-                            i++;
-                        });
-                        MultiplayerManagerServer.connectedPlayers.RemoveAt(indexPlayerToDisconnect);
-                        MultiplayerManagerServer.serverToClientClients.RemoveAt(
-                            indexPlayerToDisconnect
-                        );
-                        MultiplayerManagerServer.serverToClientStreams.RemoveAt(
-                            indexPlayerToDisconnect
-                        );
                         string connectedPlayersSerializedString = Methods.SerializeObject(
                             MultiplayerManagerServer.connectedPlayers
                         );
-                        string outgoingMessageWithoutValue =
-                            "MultiplayerManager::::::connectedPlayers:::::syncConnectedPlayers::::";
-                        outgoingMessage =
-                            outgoingMessageWithoutValue + connectedPlayersSerializedString;
+
+                        MyTCPServer.sendObjectToClients(
+                            "MultiplayerManager",
+                            "connectedPlayers",
+                            "syncConnectedPlayers",
+                            MultiplayerManagerServer.connectedPlayers
+                        );
+                    }
+
+                    static void disconnectPlayer(string playerId)
+                    {
+                        int playerIndex = Methods.getPlayerIndexByPlayerIdServer(playerId);
+                        MultiplayerManagerServer.connectedPlayers.RemoveAt(playerIndex);
+
+                        MultiplayerManagerServer.serverToClientClients[playerIndex].Close();
+                        MultiplayerManagerServer.serverToClientClients.RemoveAt(playerIndex);
+
+                        MultiplayerManagerServer.serverToClientStreams[playerIndex].Close();
+                        MultiplayerManagerServer.serverToClientStreams.RemoveAt(playerIndex);
+
+                        MyTCPServer.sendObjectToClients(
+                            "MultiplayerManager",
+                            "connectedPlayers",
+                            "syncConnectedPlayers",
+                            MultiplayerManagerServer.connectedPlayers
+                        );
                     }
             }
         }
