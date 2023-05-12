@@ -20,9 +20,26 @@ public class Server : MonoBehaviour
     {
         terminal.text = MyTCPServer.content.Replace("\r", "\n").Replace("\n\n", "\n");
         connectedPlayersCount = MultiplayerManagerServer.connectedPlayers.ToArray().Length;
-        string connectedPlayersText = "ConnectedPlayers: " + connectedPlayersCount;
-        string serverInfoText = "Server:\n" + connectedPlayersText;
-        serverInfo.text = serverInfoText;
+
+        string serverInfoText = "Server: \n";
+        string connectedPlayersText = "ConnectedPlayers: " + connectedPlayersCount + "\n";
+        string clientHandlingThreadsText =
+            "Client Handling Threads: "
+            + MultiplayerManagerServer.clientHandlingThreads.ToArray().Length
+            + "\n";
+        string serverToClientClientsText =
+            "Clients: " + MultiplayerManagerServer.serverToClientClients.ToArray().Length + "\n";
+        string serverToClientStreamsText =
+            "Streams: " + MultiplayerManagerServer.serverToClientStreams.ToArray().Length + "\n";
+
+        string content =
+            serverInfoText
+            + connectedPlayersText
+            + clientHandlingThreadsText
+            + serverToClientClientsText
+            + serverToClientStreamsText;
+        serverInfo.text = content.Replace("\r", "\n").Replace("\n\n", "\n");
+        ;
     }
 
     public void onClickStartGame()

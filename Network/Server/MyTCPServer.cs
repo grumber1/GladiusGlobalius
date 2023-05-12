@@ -9,7 +9,7 @@ public static class MyTCPServer
 {
     static TcpListener server = null;
     static Boolean acceptNewConnections = true;
-    static Thread clientHandlingThread;
+    public static Thread listenerThread;
     public static string localIp;
     public static bool serverWaitingForNewConnections = true;
     public static string content = "";
@@ -37,7 +37,9 @@ public static class MyTCPServer
         }
         finally
         {
-            stopChildThread();
+            //TODO muss ich hier vorher die clients disconnecten???
+            server.Stop();
+            //stopChildThread();
         }
     }
 
@@ -55,11 +57,6 @@ public static class MyTCPServer
         localIpsString = localIpsString.Remove(localIpsString.Length - 1);
         string[] localIps = localIpsString.Split(";");
         return localIps;
-    }
-
-    private static void stopChildThread()
-    {
-        clientHandlingThread.Abort();
     }
 
     private static String receiveMessage(NetworkStream stream)
@@ -89,6 +86,7 @@ public static class MyTCPServer
         addTextToServerConsole(
             "TCPServer: Trying to send message with " + msg.Length + " bytes: " + message
         );
+
         MultiplayerManagerServer.serverToClientStreams.ForEach(serverToClientStream =>
         {
             if (MultiplayerManagerServer.serverToClientClients[i].Connected)
@@ -120,9 +118,11 @@ public static class MyTCPServer
     private static void startClientHandlingThread()
     {
         ThreadStart clientHandlingRef = new ThreadStart(CallClientHandlingThread);
+        Thread clientHandlingThread = new Thread(clientHandlingRef);
 
-        clientHandlingThread = new Thread(clientHandlingRef);
-        clientHandlingThread.Start();
+        MultiplayerManagerServer.clientHandlingThreads.Add(clientHandlingThread);
+        int index = MultiplayerManagerServer.clientHandlingThreads.ToArray().Length - 1;
+        MultiplayerManagerServer.clientHandlingThreads[index].Start();
     }
 
     private static void CallClientHandlingThread()
@@ -134,16 +134,16 @@ public static class MyTCPServer
     {
         try
         {
-            Debug.Log("Server Thread: ClientHandling started");
+            Debug.Log("Server ClientHandling Thread: started");
             addTextToServerConsole("Server: Waiting for new connection...");
-            Debug.Log("Server: Waiting for new connection...");
+            Debug.Log("Server ClientHandling Thread: Waiting for new connection...");
 
-            TcpClient serverToClientClient = server.AcceptTcpClient();
+            TcpClient serverToClientClient = MyTCPServer.server.AcceptTcpClient();
             MultiplayerManagerServer.serverToClientClients.Add(serverToClientClient);
             acceptNewConnections = true;
 
             addTextToServerConsole("Server: Client Connected!");
-            Debug.Log("Server: Client Connected!");
+            Debug.Log("Server ClientHandling Thread: Client Connected!");
 
             NetworkStream serverToClientStream = serverToClientClient.GetStream();
             MultiplayerManagerServer.serverToClientStreams.Add(serverToClientStream);
@@ -153,31 +153,28 @@ public static class MyTCPServer
             ).Address;
             MultiplayerManagerServer.connectedIpAddresses.Add(connectedIp);
 
-            Debug.Log("Server: Client Added!");
+            Debug.Log("Server ClientHandling Thread: Client Added!");
             Boolean clientConnected = serverToClientClient.Connected;
             while (clientConnected)
             {
-                if (serverToClientStream.DataAvailable)
-                {
-                    //Debug.Log("Server: Stream Data available");
-                    String receivedMessage = receiveMessage(serverToClientStream);
-                    Debug.Log("Server: received Message: " + receivedMessage);
-                    addTextToServerConsole("Server: received Message: " + receivedMessage);
-                    TCPMessageHandlerServer.handleMessage(receivedMessage);
-                }
-                else
-                {
-                    clientConnected = serverToClientClient.Connected;
-                }
+                // if (serverToClientStream.DataAvailable)
+                // {
+                //Debug.Log("Server: Stream Data available");
+                String receivedMessage = receiveMessage(serverToClientStream);
+                Debug.Log("Server ClientHandling Thread: " + receivedMessage);
+                addTextToServerConsole("Server: received Message: " + receivedMessage);
+                TCPMessageHandlerServer.handleMessage(receivedMessage);
+                // }
+                // else
+                // {
+                //     clientConnected = serverToClientClient.Connected;
+                // }
             }
-            Debug.Log("disconnecting Client");
-            serverToClientClient.Close();
-            server.Stop();
+            Debug.Log("Server ClientHandling Thread: disconnecting Client");
         }
         finally
         {
-            Debug.Log("Server: ChildThread stopped");
-            stopChildThread();
+            Debug.Log("Server ClientHandling Thread: stopped");
         }
     }
 

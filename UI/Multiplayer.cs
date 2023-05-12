@@ -33,7 +33,6 @@ public class Multiplayer : MonoBehaviour
     public void onClickHostGame()
     {
         Methods.switchScreen(MultiplayerGO, ServerGO);
-        MultiplayerManagerClient.isServer = true;
         MyTCPServer.localIp = localIps[hostIpDropdown.value];
         startMyTCPServerListenerThread();
     }
@@ -41,27 +40,24 @@ public class Multiplayer : MonoBehaviour
     public void onClickJoinGame()
     {
         string ip = joinIps[joinIpDropdown.value];
-        if (ip.Length == 0)
-        {
-            Guid uniqueID = Guid.NewGuid();
-            MultiplayerManagerClient.remoteIp = ip;
+        Guid uniqueID = Guid.NewGuid();
+        MultiplayerManagerClient.remoteIp = ip;
 
-            string newId = uniqueID.ToString();
-            string newPlayerName = inputFieldPlayerName.text;
-            Player newPlayer = new Player(newId, newPlayerName);
-            MultiplayerManagerClient.player = newPlayer;
+        string newId = uniqueID.ToString();
+        string newPlayerName = inputFieldPlayerName.text;
+        Player newPlayer = new Player(newId, newPlayerName);
+        MultiplayerManagerClient.player = newPlayer;
 
-            MyTCPClient.TCPClient(ip);
+        MyTCPClient.TCPClient(ip);
 
-            MyTCPClient.sendObjectToServer(
-                "MultiplayerManager",
-                "connectedPlayers",
-                "addNewPlayer",
-                newPlayer
-            );
-            // TODO evtl mehr Daten mitschicken? Ip, etc..
-            Methods.switchScreen(MultiplayerGO, LobbyGO);
-        }
+        MyTCPClient.sendObjectToServer(
+            "MultiplayerManager",
+            "connectedPlayers",
+            "addNewPlayer",
+            newPlayer
+        );
+        // TODO evtl mehr Daten mitschicken? Ip, etc..
+        Methods.switchScreen(MultiplayerGO, LobbyGO);
     }
 
     public void onClickRefresh()
@@ -116,17 +112,8 @@ public class Multiplayer : MonoBehaviour
     private void startMyTCPServerListenerThread()
     {
         ThreadStart MyTCPServerListenerStartRef = new ThreadStart(CallMyTCPServerListenerStart);
-        Thread MyTCPServerListenerStartThread = new Thread(MyTCPServerListenerStartRef);
-        MyTCPServerListenerStartThread.Start();
+        Thread listenerThread = new Thread(MyTCPServerListenerStartRef);
+        MyTCPServer.listenerThread = listenerThread;
+        MyTCPServer.listenerThread.Start();
     }
-
-    // private void CallInsertIpsIntoJoinIpDropdown() {
-    //     insertLocalIpsIntoJoinIpDropdown();
-    // }
-
-    // private void startInsertIpsIntoJoinIpDropdownThread(){
-    // ThreadStart InsertIpsIntoJoinIpDropdownref = new ThreadStart(CallInsertIpsIntoJoinIpDropdown);
-    // Thread InsertIpsIntoJoinIpDropdownThread = new Thread(InsertIpsIntoJoinIpDropdownref);
-    // InsertIpsIntoJoinIpDropdownThread.Start();
-    // }
 }

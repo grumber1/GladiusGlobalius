@@ -12,6 +12,7 @@ public static class MyTCPClient
     {
         Int32 port = DevSettings.port;
         TcpClient clientToServerClient = new TcpClient(ip, port);
+        MultiplayerManagerClient.clientToServerClient = clientToServerClient;
         Stream clientToServerStream = clientToServerClient.GetStream();
         MultiplayerManagerClient.clientToServerStream = clientToServerStream;
         Debug.Log("Client Thread: Received Stream");
@@ -30,6 +31,7 @@ public static class MyTCPClient
         string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
         message = message + ":::::::";
 
+        Debug.Log("Client: Trying to send message: " + message);
         Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
         MultiplayerManagerClient.clientToServerStream.Write(data, 0, data.Length);
     }
@@ -84,7 +86,7 @@ public static class MyTCPClient
         }
         finally
         {
-            Debug.Log("Client Error");
+            Debug.Log("Client: Error in readIncomingNetworkTraffic");
             MyTCPClient.sendMessageToServer(
                 "MultiplayerManager",
                 "connectedPlayers",

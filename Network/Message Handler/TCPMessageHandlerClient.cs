@@ -12,10 +12,14 @@ public static class TCPMessageHandlerClient
         string[] messages = incomingMessages.Split(":::::::");
         foreach (string classObjectMethodValue in messages)
         {
-            (string classToCall, string objectToCall, string method, string value) =
-                Methods.resolveMessage(classObjectMethodValue);
+            if (classObjectMethodValue != "")
+            {
+                Debug.Log("Client Message Handler: Handling Message: " + classObjectMethodValue);
+                (string classToCall, string objectToCall, string method, string value) =
+                    Methods.resolveMessage(classObjectMethodValue);
 
-            handlePayload(classToCall, objectToCall, method, value);
+                handlePayload(classToCall, objectToCall, method, value);
+            }
         }
     }
 

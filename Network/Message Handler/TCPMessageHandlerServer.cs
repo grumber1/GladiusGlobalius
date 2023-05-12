@@ -9,7 +9,7 @@ public static class TCPMessageHandlerServer
 {
     public static void handleMessage(string incomingMessages)
     {
-        Debug.Log("Server: incomingMessages: " + incomingMessages);
+        Debug.Log("Server Message Handler: incomingMessages: " + incomingMessages);
         string[] messages = incomingMessages.Split(":::::::");
         foreach (string classObjectMethodValue in messages)
             if (classObjectMethodValue != "")
@@ -83,12 +83,15 @@ public static class TCPMessageHandlerServer
                     static void disconnectPlayer(string playerId)
                     {
                         int playerIndex = Methods.getPlayerIndexByPlayerIdServer(playerId);
+
+                        MultiplayerManagerServer.clientHandlingThreads.RemoveAt(playerIndex);
+
                         MultiplayerManagerServer.connectedPlayers.RemoveAt(playerIndex);
 
-                        MultiplayerManagerServer.serverToClientClients[playerIndex].Close();
+                        MultiplayerManagerServer.serverToClientClients[playerIndex].Dispose();
                         MultiplayerManagerServer.serverToClientClients.RemoveAt(playerIndex);
 
-                        MultiplayerManagerServer.serverToClientStreams[playerIndex].Close();
+                        MultiplayerManagerServer.serverToClientStreams[playerIndex].Dispose();
                         MultiplayerManagerServer.serverToClientStreams.RemoveAt(playerIndex);
 
                         MyTCPServer.sendObjectToClients(
