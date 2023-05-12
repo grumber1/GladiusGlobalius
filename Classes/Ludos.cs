@@ -3,23 +3,19 @@ using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 
-public class Player
+public class Ludos
 {
-    public string id;
     public string name;
-    public string ip;
-    public int gold;
+    public string gladiators;
 
     // public Buildings buildings = new Buildings();
     // public Crew crew = new Crew();
 
-    public Player() { }
+    public Ludos() { }
 
     //Constructor
-    public Player(string newId, string newName, int newGold = 3000)
+    public Ludos(string newName)
     {
-        id = newId;
         name = newName;
-        gold = newGold;
     }
 }

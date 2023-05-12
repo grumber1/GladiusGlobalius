@@ -9,7 +9,6 @@ public static class TCPMessageHandlerServer
 {
     public static void handleMessage(string incomingMessages)
     {
-        Debug.Log("Server Message Handler: incomingMessages: " + incomingMessages);
         string[] messages = incomingMessages.Split(":::::::");
         foreach (string classObjectMethodValue in messages)
             if (classObjectMethodValue != "")
@@ -32,6 +31,10 @@ public static class TCPMessageHandlerServer
         {
             case "MultiplayerManager":
                 multiplayerManager(objectToCall, method, value);
+                break;
+
+            case "MyTCPServer":
+                myTCPServer(objectToCall, method, value);
                 break;
         }
     }
@@ -100,6 +103,33 @@ public static class TCPMessageHandlerServer
                             "syncConnectedPlayers",
                             MultiplayerManagerServer.connectedPlayers
                         );
+                    }
+            }
+        }
+    }
+
+    private static void myTCPServer(string objectToCall, string method, string value)
+    {
+        switch (objectToCall)
+        {
+            case "MessageByteSizeToReceive":
+                messageByteSizeToReceive(method, value);
+                break;
+        }
+
+        static void messageByteSizeToReceive(string method, string value)
+        {
+            switch (method)
+            {
+                case "set":
+                    setMessageByteSize(value);
+                    break;
+
+                    static void setMessageByteSize(string byteSizeString)
+                    {
+                        int byteSize = Int32.Parse(byteSizeString);
+
+                        MyTCPServer.byteSizeForMessageToReceive = byteSize;
                     }
             }
         }

@@ -8,6 +8,8 @@ using UnityEngine;
 
 public static class MyTCPClient
 {
+    public static int byteSizeForMessageToReceive = 256;
+
     public static void TCPClient(string ip)
     {
         Int32 port = DevSettings.port;
@@ -30,10 +32,40 @@ public static class MyTCPClient
     {
         string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
         message = message + ":::::::";
+        byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
 
-        Debug.Log("Client: Trying to send message: " + message);
-        Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
-        MultiplayerManagerClient.clientToServerStream.Write(data, 0, data.Length);
+        sendByteSizeToServer(msg);
+
+        Debug.Log("TCPClient: Trying to send message with " + msg.Length + " bytes");
+        MultiplayerManagerClient.clientToServerStream.Write(msg, 0, msg.Length);
+        Debug.Log("TCPClient: sent Message: " + message);
+    }
+
+    public static void sendByteSizeToServer(byte[] msg)
+    {
+        string classToCallMessageLength = "MyTCPServer";
+        string objectToCallMessageLength = "MessageByteSizeToReceive";
+        string methodMessageLength = "set";
+        string valueMessageLength = msg.Length.ToString();
+        string messageLengthMessage =
+            classToCallMessageLength
+            + "::::::"
+            + objectToCallMessageLength
+            + ":::::"
+            + methodMessageLength
+            + "::::"
+            + valueMessageLength;
+        byte[] msgLengthMessage = System.Text.Encoding.ASCII.GetBytes(messageLengthMessage);
+
+        Debug.Log("TCPClient: Setting Server-Receiver to " + valueMessageLength + " bytes");
+        Debug.Log(
+            "TCPClient: Settings-Message has a size of " + msgLengthMessage.Length + " bytes"
+        );
+        MultiplayerManagerClient.clientToServerStream.Write(
+            msgLengthMessage,
+            0,
+            msgLengthMessage.Length
+        );
     }
 
     public static void sendObjectToServer<T>(
@@ -69,24 +101,26 @@ public static class MyTCPClient
         {
             while (true)
             {
-                Byte[] decodeData = new Byte[1024];
+                Byte[] bytes = new Byte[byteSizeForMessageToReceive];
                 Int32 streamBytes = MultiplayerManagerClient.clientToServerStream.Read(
-                    decodeData,
+                    bytes,
                     0,
-                    decodeData.Length
+                    bytes.Length
                 );
                 String receivedMessage = System.Text.Encoding.ASCII.GetString(
-                    decodeData,
+                    bytes,
                     0,
                     streamBytes
                 );
-                Debug.Log("receivedMessage: " + receivedMessage);
+                byteSizeForMessageToReceive = 256;
+                Debug.Log("TCPClient: received message: " + receivedMessage);
+                Debug.Log("TCPServer: received message has " + bytes.Length + " bytes");
                 TCPMessageHandlerClient.handleMessage(receivedMessage);
             }
         }
         finally
         {
-            Debug.Log("Client: Error in readIncomingNetworkTraffic");
+            Debug.Log("Client readIncomingNetworkTraffic Thread: Error");
             MyTCPClient.sendMessageToServer(
                 "MultiplayerManager",
                 "connectedPlayers",

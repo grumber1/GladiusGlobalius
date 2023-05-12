@@ -13,6 +13,7 @@ public static class MyTCPServer
     public static string localIp;
     public static bool serverWaitingForNewConnections = true;
     public static string content = "";
+    public static int byteSizeForMessageToReceive = 256;
 
     public static void listenerStart()
     {
@@ -61,12 +62,15 @@ public static class MyTCPServer
 
     private static String receiveMessage(NetworkStream stream)
     {
-        Byte[] bytes = new Byte[1024];
+        Byte[] bytes = new Byte[byteSizeForMessageToReceive];
         String receivedMessage = System.Text.Encoding.ASCII.GetString(
             bytes,
             0,
             stream.Read(bytes, 0, bytes.Length)
         );
+        byteSizeForMessageToReceive = 256;
+        Debug.Log("TCPServer: received message: " + receivedMessage);
+        Debug.Log("TCPServer: received message has " + bytes.Length + " bytes");
         return receivedMessage;
     }
 
@@ -79,14 +83,13 @@ public static class MyTCPServer
     {
         string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
         message = message + ":::::::";
-
         byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
-        int i = 0;
-        Debug.Log("TCPServer: Trying to send message with " + msg.Length + " bytes: " + message);
-        addTextToServerConsole(
-            "TCPServer: Trying to send message with " + msg.Length + " bytes: " + message
-        );
 
+        sendByteSizeToClients(msg);
+
+        Debug.Log("TCPServer: Trying to send message with " + msg.Length + " bytes");
+        addTextToServerConsole("TCPServer: Trying to send message with " + msg.Length + " bytes");
+        int i = 0;
         MultiplayerManagerServer.serverToClientStreams.ForEach(serverToClientStream =>
         {
             if (MultiplayerManagerServer.serverToClientClients[i].Connected)
@@ -96,8 +99,40 @@ public static class MyTCPServer
             i++;
         });
 
-        Debug.Log("Server: sent Message: " + message);
+        Debug.Log("TCPServer: sent Message: " + message);
         addTextToServerConsole("Server: sent Message: " + message);
+    }
+
+    public static void sendByteSizeToClients(byte[] msg)
+    {
+        string classToCallMessageLength = "MyTCPClient";
+        string objectToCallMessageLength = "MessageByteSizeToReceive";
+        string methodMessageLength = "set";
+        string valueMessageLength = msg.Length.ToString();
+        string messageLengthMessage =
+            classToCallMessageLength
+            + "::::::"
+            + objectToCallMessageLength
+            + ":::::"
+            + methodMessageLength
+            + "::::"
+            + valueMessageLength;
+        byte[] msgLengthMessage = System.Text.Encoding.ASCII.GetBytes(messageLengthMessage);
+
+        int i = 0;
+
+        Debug.Log("TCPServer: Setting Client-Receiver to " + valueMessageLength + " bytes");
+        Debug.Log(
+            "TCPServer: Settings-Message has a size of " + msgLengthMessage.Length + " bytes"
+        );
+        MultiplayerManagerServer.serverToClientStreams.ForEach(serverToClientStream =>
+        {
+            if (MultiplayerManagerServer.serverToClientClients[i].Connected)
+            {
+                serverToClientStream.Write(msgLengthMessage, 0, msgLengthMessage.Length);
+            }
+            i++;
+        });
     }
 
     public static void sendObjectToClients<T>(
@@ -161,7 +196,6 @@ public static class MyTCPServer
                 // {
                 //Debug.Log("Server: Stream Data available");
                 String receivedMessage = receiveMessage(serverToClientStream);
-                Debug.Log("Server ClientHandling Thread: " + receivedMessage);
                 addTextToServerConsole("Server: received Message: " + receivedMessage);
                 TCPMessageHandlerServer.handleMessage(receivedMessage);
                 // }

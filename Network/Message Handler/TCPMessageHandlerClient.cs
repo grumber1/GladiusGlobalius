@@ -7,14 +7,11 @@ public static class TCPMessageHandlerClient
 {
     public static void handleMessage(string incomingMessages)
     {
-        Debug.Log("Client Message Handler: incomingMessages: " + incomingMessages);
-
         string[] messages = incomingMessages.Split(":::::::");
         foreach (string classObjectMethodValue in messages)
         {
             if (classObjectMethodValue != "")
             {
-                Debug.Log("Client Message Handler: Handling Message: " + classObjectMethodValue);
                 (string classToCall, string objectToCall, string method, string value) =
                     Methods.resolveMessage(classObjectMethodValue);
 
@@ -34,6 +31,10 @@ public static class TCPMessageHandlerClient
         {
             case "MultiplayerManager":
                 multiplayerManager(objectToCall, method, value);
+                break;
+
+            case "MyTCPClient":
+                myTCPClient(objectToCall, method, value);
                 break;
         }
     }
@@ -89,6 +90,33 @@ public static class TCPMessageHandlerClient
                         {
                             MultiplayerManagerClient.startGameButton = true;
                         }
+                    }
+            }
+        }
+    }
+
+    private static void myTCPClient(string objectToCall, string method, string value)
+    {
+        switch (objectToCall)
+        {
+            case "MessageByteSizeToReceive":
+                messageByteSizeToReceive(method, value);
+                break;
+        }
+
+        static void messageByteSizeToReceive(string method, string value)
+        {
+            switch (method)
+            {
+                case "set":
+                    setMessageByteSize(value);
+                    break;
+
+                    static void setMessageByteSize(string byteSizeString)
+                    {
+                        int byteSize = Int32.Parse(byteSizeString);
+
+                        MyTCPClient.byteSizeForMessageToReceive = byteSize;
                     }
             }
         }
