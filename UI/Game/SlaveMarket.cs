@@ -9,7 +9,6 @@ public class SlaveMarket : MonoBehaviour
 
     void Start() { }
 
-    // Update is called once per frame
     void Update()
     {
         List<string> availableSlavesString = getAvailableSlaves();

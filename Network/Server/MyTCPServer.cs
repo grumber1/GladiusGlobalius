@@ -201,17 +201,9 @@ public static class MyTCPServer
             Debug.Log("Server ClientHandling Thread: Client Added!");
             while (serverToClientClient.Connected)
             {
-                // if (serverToClientStream.DataAvailable)
-                // {
-                //Debug.Log("Server: Stream Data available");
                 String receivedMessage = receiveMessage(serverToClientStream);
                 addTextToServerConsole("Server: received Message: " + receivedMessage);
                 TCPMessageHandlerServer.handleMessage(receivedMessage);
-                // }
-                // else
-                // {
-                //     clientConnected = serverToClientClient.Connected;
-                // }
             }
             Debug.Log("Server ClientHandling Thread: disconnecting Client");
         }

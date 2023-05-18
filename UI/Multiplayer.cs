@@ -56,7 +56,7 @@ public class Multiplayer : MonoBehaviour
             Messages.Client.MultiplayerManager.ConnectedPlayers.addNewPlayer,
             newPlayer
         );
-        // TODO evtl mehr Daten mitschicken? Ip, etc..
+
         Methods.switchScreen(MultiplayerGO, LobbyGO);
     }
 
