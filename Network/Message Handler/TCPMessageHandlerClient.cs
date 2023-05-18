@@ -61,11 +61,21 @@ public static class TCPMessageHandlerClient
             switch (method)
             {
                 case "syncConnectedPlayers":
-                    syncConnectedPlayers(value);
+                    syncConnectedPlayers(method, value);
                     break;
 
-                    static void syncConnectedPlayers(string connectedPlayersSerializedString)
+                    static void syncConnectedPlayers(
+                        string method,
+                        string connectedPlayersSerializedString
+                    )
                     {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling "
+                                + method
+                                + "."
+                                + connectedPlayersSerializedString
+                        );
+
                         List<Player> connectedPlayers = Methods.DeserializeObject<List<Player>>(
                             connectedPlayersSerializedString
                         );
@@ -85,12 +95,19 @@ public static class TCPMessageHandlerClient
             switch (method)
             {
                 case "set":
-                    set(value);
+                    set(method, value);
                     break;
 
-                    static void set(string value)
+                    static void set(string method, string startGameButtonValue)
                     {
-                        if (value == "true")
+                        Debug.Log(
+                            "TCP Message Handler Client: calling "
+                                + method
+                                + "."
+                                + startGameButtonValue
+                        );
+
+                        if (startGameButtonValue == "true")
                         {
                             MultiplayerManagerClient.startGameButton = true;
                         }
@@ -112,12 +129,19 @@ public static class TCPMessageHandlerClient
         {
             switch (method)
             {
-                case "sync":
-                    syncAvailableSlaves(value);
+                case "syncAvailableSlaves":
+                    syncAvailableSlaves(method, value);
                     break;
 
-                    static void syncAvailableSlaves(string availableSlavesSerialized)
+                    static void syncAvailableSlaves(string method, string availableSlavesSerialized)
                     {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling "
+                                + method
+                                + "."
+                                + availableSlavesSerialized
+                        );
+
                         List<Gladiator> availableSlaves = Methods.DeserializeObject<
                             List<Gladiator>
                         >(availableSlavesSerialized);
@@ -142,11 +166,15 @@ public static class TCPMessageHandlerClient
             switch (method)
             {
                 case "set":
-                    setMessageByteSize(value);
+                    setMessageByteSize(method, value);
                     break;
 
-                    static void setMessageByteSize(string byteSizeString)
+                    static void setMessageByteSize(string method, string byteSizeString)
                     {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling " + method + "." + byteSizeString
+                        );
+
                         byteSizeString = byteSizeString.Trim();
                         int byteSize = Int32.Parse(byteSizeString);
 
@@ -171,11 +199,15 @@ public static class TCPMessageHandlerClient
             switch (method)
             {
                 case "method":
-                    setMessageByteSize(value);
+                    setMessageByteSize(method, value);
                     break;
 
-                    static void setMessageByteSize(string byteSizeString)
+                    static void setMessageByteSize(string method, string byteSizeString)
                     {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling " + method + "." + byteSizeString
+                        );
+
                         int byteSize = Int32.Parse(byteSizeString);
 
                         MyTCPClient.byteSizeForMessageToReceive = byteSize;

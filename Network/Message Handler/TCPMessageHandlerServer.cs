@@ -58,15 +58,22 @@ public static class TCPMessageHandlerServer
             switch (method)
             {
                 case "addNewPlayer":
-                    addNewPlayer(value);
+                    addNewPlayer(method, value);
                     break;
 
                 case "disconnectPlayer":
-                    disconnectPlayer(value);
+                    disconnectPlayer(method, value);
                     break;
 
-                    static void addNewPlayer(string newPlayerSerialized)
+                    static void addNewPlayer(string method, string newPlayerSerialized)
                     {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling "
+                                + method
+                                + "."
+                                + newPlayerSerialized
+                        );
+
                         Player newPlayer = Methods.DeserializeObject<Player>(newPlayerSerialized);
 
                         string newlyConnectedIp = MultiplayerManagerServer.connectedIpAddresses[
@@ -88,8 +95,10 @@ public static class TCPMessageHandlerServer
                         );
                     }
 
-                    static void disconnectPlayer(string playerId)
+                    static void disconnectPlayer(string method, string playerId)
                     {
+                        Debug.Log("TCP Message Handler Client: calling " + method + "." + playerId);
+
                         int playerIndex = Methods.getPlayerIndexByPlayerIdServer(playerId);
 
                         MultiplayerManagerServer.clientHandlingThreads.RemoveAt(playerIndex);
@@ -127,11 +136,15 @@ public static class TCPMessageHandlerServer
             switch (method)
             {
                 case "set":
-                    setMessageByteSize(value);
+                    setMessageByteSize(method, value);
                     break;
 
-                    static void setMessageByteSize(string byteSizeString)
+                    static void setMessageByteSize(string method, string byteSizeString)
                     {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling " + method + "." + byteSizeString
+                        );
+
                         byteSizeString = byteSizeString.Trim();
                         int byteSize = Int32.Parse(byteSizeString);
 
@@ -156,11 +169,18 @@ public static class TCPMessageHandlerServer
             switch (method)
             {
                 case "buySlave":
-                    buySlave(value);
+                    buySlave(method, value);
                     break;
 
-                    static void buySlave(string gladiatorIdAndPlayerId)
+                    static void buySlave(string method, string gladiatorIdAndPlayerId)
                     {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling "
+                                + method
+                                + "."
+                                + gladiatorIdAndPlayerId
+                        );
+
                         string playerId = gladiatorIdAndPlayerId.Split("::")[0];
                         string gladiatorId = gladiatorIdAndPlayerId.Split("::")[1];
 
@@ -177,7 +197,13 @@ public static class TCPMessageHandlerServer
                         // Set OwnerId for selected Gladiator
                         foundGladiator.ownedBy = playerId;
                         foundPlayer.ownedGladiators.Add(foundGladiator);
+                        Debug.Log(
+                            "1: " + MultiplayerSlaveMarketServer.availableSlaves.ToArray().Length
+                        );
                         MultiplayerSlaveMarketServer.availableSlaves.Remove(foundGladiator);
+                        Debug.Log(
+                            "2: " + MultiplayerSlaveMarketServer.availableSlaves.ToArray().Length
+                        );
 
                         MyTCPServer.sendObjectToClients(
                             "MultiplayerManager",
@@ -211,11 +237,15 @@ public static class TCPMessageHandlerServer
             switch (method)
             {
                 case "method":
-                    setMessageByteSize(value);
+                    setMessageByteSize(method, value);
                     break;
 
-                    static void setMessageByteSize(string byteSizeString)
+                    static void setMessageByteSize(string method, string byteSizeString)
                     {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling " + method + "." + byteSizeString
+                        );
+
                         int byteSize = Int32.Parse(byteSizeString);
 
                         MyTCPClient.byteSizeForMessageToReceive = byteSize;
