@@ -6,18 +6,14 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Xml.Serialization;
+using System.Text;
 
 public class MainMenu : MonoBehaviour
 {
     public GameObject MainMenuGO;
     public GameObject MultiplayerGO;
 
-    void Start()
-    {
-        // String playerString = Methods.SerializeObject(player);
-
-        // Player player2 = Methods.DeserializeObject<Player>(playerString);
-    }
+    void Start() { }
 
     public void onClickMultiplayer()
     {

@@ -16,6 +16,6 @@ public class Ludos
     //Constructor
     public Ludos(string newName)
     {
-        name = newName;
+        this.name = newName;
     }
 }

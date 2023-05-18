@@ -9,6 +9,7 @@ public class Server : MonoBehaviour
 {
     public GameObject ServerGO;
     public GameObject GameGO;
+    public GameObject runningServerGO;
     public TMP_Text terminal;
     public TMP_Text serverInfo;
     public double connectedPlayersCount;
@@ -45,5 +46,6 @@ public class Server : MonoBehaviour
     public void onClickStartGame()
     {
         MyTCPServer.sendMessageToClients("MultiplayerManager", "startGameButton", "set", "true");
+        runningServerGO.SetActive(true);
     }
 }

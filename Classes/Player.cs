@@ -9,6 +9,7 @@ public class Player
     public string name;
     public string ip;
     public int gold;
+    public List<Gladiator> ownedGladiators = new List<Gladiator>();
 
     // public Buildings buildings = new Buildings();
     // public Crew crew = new Crew();

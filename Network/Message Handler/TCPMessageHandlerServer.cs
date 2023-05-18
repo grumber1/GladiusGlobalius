@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
@@ -35,6 +36,10 @@ public static class TCPMessageHandlerServer
 
             case "MyTCPServer":
                 myTCPServer(objectToCall, method, value);
+                break;
+
+            case "MultiplayerSlaveMarket":
+                multiplayerSlaveMarket(objectToCall, method, value);
                 break;
         }
     }
@@ -127,9 +132,93 @@ public static class TCPMessageHandlerServer
 
                     static void setMessageByteSize(string byteSizeString)
                     {
+                        byteSizeString = byteSizeString.Trim();
                         int byteSize = Int32.Parse(byteSizeString);
 
                         MyTCPServer.byteSizeForMessageToReceive = byteSize;
+                        Debug.Log("TCPServer: set byteSize to " + byteSize + " bytes");
+                    }
+            }
+        }
+    }
+
+    private static void multiplayerSlaveMarket(string objectToCall, string method, string value)
+    {
+        switch (objectToCall)
+        {
+            case "availableSlaves":
+                availableSlaves(method, value);
+                break;
+        }
+
+        static void availableSlaves(string method, string value)
+        {
+            switch (method)
+            {
+                case "buySlave":
+                    buySlave(value);
+                    break;
+
+                    static void buySlave(string gladiatorIdAndPlayerId)
+                    {
+                        string playerId = gladiatorIdAndPlayerId.Split("::")[0];
+                        string gladiatorId = gladiatorIdAndPlayerId.Split("::")[1];
+
+                        Player foundPlayer =
+                            MultiplayerManagerServer.connectedPlayers.FirstOrDefault(
+                                player => player.id == playerId
+                            );
+
+                        Gladiator foundGladiator =
+                            MultiplayerSlaveMarketServer.availableSlaves.FirstOrDefault(
+                                gladiator => gladiator.id == gladiatorId
+                            );
+
+                        // Set OwnerId for selected Gladiator
+                        foundGladiator.ownedBy = playerId;
+                        foundPlayer.ownedGladiators.Add(foundGladiator);
+                        MultiplayerSlaveMarketServer.availableSlaves.Remove(foundGladiator);
+
+                        MyTCPServer.sendObjectToClients(
+                            "MultiplayerManager",
+                            "connectedPlayers",
+                            "syncConnectedPlayers",
+                            MultiplayerManagerServer.connectedPlayers
+                        );
+
+                        MyTCPServer.sendObjectToClients(
+                            "MultiplayerSlaveMarket",
+                            "availableSlaves",
+                            "syncAvailableSlaves",
+                            MultiplayerSlaveMarketServer.availableSlaves
+                        );
+                    }
+            }
+        }
+    }
+
+    private static void defaultSetup(string objectToCall, string method, string value)
+    {
+        switch (objectToCall)
+        {
+            case "objectToCall":
+                messageByteSizeToReceive(method, value);
+                break;
+        }
+
+        static void messageByteSizeToReceive(string method, string value)
+        {
+            switch (method)
+            {
+                case "method":
+                    setMessageByteSize(value);
+                    break;
+
+                    static void setMessageByteSize(string byteSizeString)
+                    {
+                        int byteSize = Int32.Parse(byteSizeString);
+
+                        MyTCPClient.byteSizeForMessageToReceive = byteSize;
                     }
             }
         }

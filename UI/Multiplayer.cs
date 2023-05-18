@@ -40,11 +40,13 @@ public class Multiplayer : MonoBehaviour
     public void onClickJoinGame()
     {
         string ip = joinIps[joinIpDropdown.value];
-        Guid uniqueID = Guid.NewGuid();
         MultiplayerManagerClient.remoteIp = ip;
 
+        Guid uniqueID = Guid.NewGuid();
         string newId = uniqueID.ToString();
+
         string newPlayerName = inputFieldPlayerName.text;
+
         Player newPlayer = new Player(newId, newPlayerName);
         MultiplayerManagerClient.player = newPlayer;
 

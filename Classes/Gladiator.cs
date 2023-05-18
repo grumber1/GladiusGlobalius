@@ -7,16 +7,28 @@ public class Gladiator
 {
     public string id;
     public string name;
-    public int health;
-    public int attack;
-    public int defense;
+    public GladiatorBody body;
+    public GladiatorAttributes attributes;
+    public GladiatorWeapons weapons;
+    public string ownedBy;
 
     public Gladiator() { }
 
     //Constructor
-    public Gladiator(string newId, string newName)
+    public Gladiator(
+        string newId,
+        string newName,
+        GladiatorBody newBody,
+        GladiatorAttributes newAttributes,
+        GladiatorWeapons newWeapons,
+        string newOwnedBy = "slaveTrader"
+    )
     {
-        id = newId;
-        name = newName;
+        this.id = newId;
+        this.name = newName;
+        this.body = newBody;
+        this.attributes = newAttributes;
+        this.weapons = newWeapons;
+        this.ownedBy = newOwnedBy;
     }
 }

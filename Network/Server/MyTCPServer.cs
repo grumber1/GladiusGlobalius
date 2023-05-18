@@ -13,7 +13,7 @@ public static class MyTCPServer
     public static string localIp;
     public static bool serverWaitingForNewConnections = true;
     public static string content = "";
-    public static int byteSizeForMessageToReceive = 256;
+    public static int byteSizeForMessageToReceive = DevSettings.standardByteSize;
 
     public static void listenerStart()
     {
@@ -68,7 +68,7 @@ public static class MyTCPServer
             0,
             stream.Read(bytes, 0, bytes.Length)
         );
-        byteSizeForMessageToReceive = 256;
+        byteSizeForMessageToReceive = DevSettings.standardByteSize;
         Debug.Log("TCPServer: received message: " + receivedMessage);
         Debug.Log("TCPServer: received message has " + bytes.Length + " bytes");
         return receivedMessage;
@@ -103,33 +103,52 @@ public static class MyTCPServer
         addTextToServerConsole("Server: sent Message: " + message);
     }
 
-    public static void sendByteSizeToClients(byte[] msg)
+    public static void sendByteSizeToClients(byte[] originalMessageInBytes)
     {
-        string classToCallMessageLength = "MyTCPClient";
-        string objectToCallMessageLength = "MessageByteSizeToReceive";
-        string methodMessageLength = "set";
-        string valueMessageLength = msg.Length.ToString();
-        string messageLengthMessage =
-            classToCallMessageLength
+        string classToCallByteSizeMessage = "MyTCPClient";
+        string objectToCallByteSizeMessage = "MessageByteSizeToReceive";
+        string methodByteSizeMessage = "set";
+        string valueByteSizeMessage = originalMessageInBytes.Length.ToString();
+        string byteSizeMessage =
+            classToCallByteSizeMessage
             + "::::::"
-            + objectToCallMessageLength
+            + objectToCallByteSizeMessage
             + ":::::"
-            + methodMessageLength
+            + methodByteSizeMessage
             + "::::"
-            + valueMessageLength;
-        byte[] msgLengthMessage = System.Text.Encoding.ASCII.GetBytes(messageLengthMessage);
+            + valueByteSizeMessage;
 
-        int i = 0;
+        byte[] byteSizeMessageInBytes = System.Text.Encoding.ASCII.GetBytes(byteSizeMessage);
 
-        Debug.Log("TCPServer: Setting Client-Receiver to " + valueMessageLength + " bytes");
+        Debug.Log("Original byteSizeMessageInBytes is " + byteSizeMessageInBytes.Length + " bytes");
+        for (
+            int messageBytes = byteSizeMessageInBytes.Length;
+            messageBytes < DevSettings.standardByteSize;
+            messageBytes++
+        )
+        {
+            byteSizeMessage += " ";
+        }
+
+        byteSizeMessageInBytes = System.Text.Encoding.ASCII.GetBytes(byteSizeMessage);
+        Debug.Log("Extended byteSizeMessageInBytes is " + byteSizeMessageInBytes.Length + " bytes");
+
         Debug.Log(
-            "TCPServer: Settings-Message has a size of " + msgLengthMessage.Length + " bytes"
+            "TCPServer: Setting Client-Receiver to " + originalMessageInBytes.Length + " bytes"
         );
+        Debug.Log(
+            "TCPServer: Settings-Message has a size of " + byteSizeMessageInBytes.Length + " bytes"
+        );
+        int i = 0;
         MultiplayerManagerServer.serverToClientStreams.ForEach(serverToClientStream =>
         {
             if (MultiplayerManagerServer.serverToClientClients[i].Connected)
             {
-                serverToClientStream.Write(msgLengthMessage, 0, msgLengthMessage.Length);
+                serverToClientStream.Write(
+                    byteSizeMessageInBytes,
+                    0,
+                    byteSizeMessageInBytes.Length
+                );
             }
             i++;
         });

@@ -9,23 +9,24 @@ public class beforeStart : MonoBehaviour
     public GameObject LobbyGO;
     public GameObject GameGO;
     public GameObject ServerGO;
+    public GameObject SlaveMarketGO;
+    public GameObject OwnedGladiatorsGO;
+
     // Start is called before the first frame update
 
-    void Awake(){        
+    void Awake()
+    {
         MainMenuGO.SetActive(true);
         MultiplayerGO.SetActive(false);
         LobbyGO.SetActive(false);
-        GameGO.SetActive(false);   
-        ServerGO.SetActive(false);  
-    }
-    void Start()
-    {
-        
+        GameGO.SetActive(false);
+        ServerGO.SetActive(false);
+        SlaveMarketGO.SetActive(false);
+        OwnedGladiatorsGO.SetActive(false);
     }
 
+    void Start() { }
+
     // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    void Update() { }
 }

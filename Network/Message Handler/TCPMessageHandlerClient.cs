@@ -33,6 +33,10 @@ public static class TCPMessageHandlerClient
                 multiplayerManager(objectToCall, method, value);
                 break;
 
+            case "MultiplayerSlaveMarket":
+                multiplayerSlaveMarket(objectToCall, method, value);
+                break;
+
             case "MyTCPClient":
                 myTCPClient(objectToCall, method, value);
                 break;
@@ -95,6 +99,35 @@ public static class TCPMessageHandlerClient
         }
     }
 
+    private static void multiplayerSlaveMarket(string objectToCall, string method, string value)
+    {
+        switch (objectToCall)
+        {
+            case "availableSlaves":
+                availableSlaves(method, value);
+                break;
+        }
+
+        static void availableSlaves(string method, string value)
+        {
+            switch (method)
+            {
+                case "sync":
+                    syncAvailableSlaves(value);
+                    break;
+
+                    static void syncAvailableSlaves(string availableSlavesSerialized)
+                    {
+                        List<Gladiator> availableSlaves = Methods.DeserializeObject<
+                            List<Gladiator>
+                        >(availableSlavesSerialized);
+
+                        MultiplayerSlaveMarketClient.availableSlaves = availableSlaves;
+                    }
+            }
+        }
+    }
+
     private static void myTCPClient(string objectToCall, string method, string value)
     {
         switch (objectToCall)
@@ -109,6 +142,35 @@ public static class TCPMessageHandlerClient
             switch (method)
             {
                 case "set":
+                    setMessageByteSize(value);
+                    break;
+
+                    static void setMessageByteSize(string byteSizeString)
+                    {
+                        byteSizeString = byteSizeString.Trim();
+                        int byteSize = Int32.Parse(byteSizeString);
+
+                        MyTCPClient.byteSizeForMessageToReceive = byteSize;
+                        Debug.Log("TCPClient: set byteSize to " + byteSize + " bytes");
+                    }
+            }
+        }
+    }
+
+    private static void defaultSetup(string objectToCall, string method, string value)
+    {
+        switch (objectToCall)
+        {
+            case "objectToCall":
+                messageByteSizeToReceive(method, value);
+                break;
+        }
+
+        static void messageByteSizeToReceive(string method, string value)
+        {
+            switch (method)
+            {
+                case "method":
                     setMessageByteSize(value);
                     break;
 

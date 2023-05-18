@@ -5,9 +5,11 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Linq;
 using UnityEngine;
 using System.IO;
 using System.Xml.Serialization;
+using System;
 
 public static class Methods
 {
@@ -158,5 +160,37 @@ public static class Methods
         });
 
         return index;
+    }
+
+    public static Gladiator createNewGladiator(
+        string newName,
+        double newBaseHealth,
+        double newBaseAttributes,
+        Weapon newLeftArmWeapon,
+        Weapon newRightArmWeapon
+    )
+    {
+        Guid uniqueID = Guid.NewGuid();
+        string newId = uniqueID.ToString();
+
+        GladiatorBody newGladiatorBody = new GladiatorBody(newBaseHealth);
+
+        GladiatorAttributes newGladiatorAttributes = new GladiatorAttributes(newBaseAttributes);
+
+        GladiatorWeapons newGladiatorWeapons = new GladiatorWeapons(
+            newLeftArmWeapon,
+            newRightArmWeapon
+        );
+
+        Gladiator newGladiator = new Gladiator(
+            newId,
+            newName,
+            newGladiatorBody,
+            newGladiatorAttributes,
+            newGladiatorWeapons,
+            "slaveTrader"
+        );
+
+        return newGladiator;
     }
 }

@@ -6,4 +6,5 @@ public static class DevSettings
 {
     public static int port = 14001;
     public static int pingTimeout = 5;
+    public static int standardByteSize = 58;
 }
