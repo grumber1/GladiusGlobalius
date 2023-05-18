@@ -21,9 +21,7 @@ public class runningServer : MonoBehaviour
         }
 
         MyTCPServer.sendObjectToClients(
-            "MultiplayerSlaveMarket",
-            "availableSlaves",
-            "syncAvailableSlaves",
+            Messages.Server.MultiplayerSlaveMarket.AvailableSlaves.syncAvailableSlaves,
             MultiplayerSlaveMarketServer.availableSlaves
         );
     }

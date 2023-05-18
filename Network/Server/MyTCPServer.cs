@@ -74,39 +74,10 @@ public static class MyTCPServer
         return receivedMessage;
     }
 
-    public static void sendMessageToClients(
-        string classToCall,
-        string objectToCall,
-        string method,
-        string value
-    )
-    {
-        string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
-        message = message + ":::::::";
-        byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
-
-        sendByteSizeToClients(msg);
-
-        Debug.Log("TCPServer: Trying to send message with " + msg.Length + " bytes");
-        addTextToServerConsole("TCPServer: Trying to send message with " + msg.Length + " bytes");
-        int i = 0;
-        MultiplayerManagerServer.serverToClientStreams.ForEach(serverToClientStream =>
-        {
-            if (MultiplayerManagerServer.serverToClientClients[i].Connected)
-            {
-                serverToClientStream.Write(msg, 0, msg.Length);
-            }
-            i++;
-        });
-
-        Debug.Log("TCPServer: sent Message: " + message);
-        addTextToServerConsole("Server: sent Message: " + message);
-    }
-
     public static void sendByteSizeToClients(byte[] originalMessageInBytes)
     {
-        string classToCallByteSizeMessage = "MyTCPClient";
-        string objectToCallByteSizeMessage = "MessageByteSizeToReceive";
+        string classToCallByteSizeMessage = "myTCPClient";
+        string objectToCallByteSizeMessage = "messageByteSizeToReceive";
         string methodByteSizeMessage = "set";
         string valueByteSizeMessage = originalMessageInBytes.Length.ToString();
         string byteSizeMessage =
@@ -154,19 +125,39 @@ public static class MyTCPServer
         });
     }
 
-    public static void sendObjectToClients<T>(
-        string classToCall,
-        string objectToCall,
-        string method,
-        T objectToSerialize
-    )
+    public static void sendMessageToClients(string classObjectMethodToCall, string value)
     {
-        string convertedMessageWithoutValue =
-            classToCall + "::::::" + objectToCall + ":::::" + method + "::::";
+        string classToCall = classObjectMethodToCall.Split(".")[0];
+        string objectToCall = classObjectMethodToCall.Split(".")[1];
+        string method = classObjectMethodToCall.Split(".")[2];
 
+        string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
+        message = message + ":::::::";
+        byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
+
+        sendByteSizeToClients(msg);
+
+        Debug.Log("TCPServer: Trying to send message with " + msg.Length + " bytes");
+        addTextToServerConsole("TCPServer: Trying to send message with " + msg.Length + " bytes");
+        int i = 0;
+        MultiplayerManagerServer.serverToClientStreams.ForEach(serverToClientStream =>
+        {
+            if (MultiplayerManagerServer.serverToClientClients[i].Connected)
+            {
+                serverToClientStream.Write(msg, 0, msg.Length);
+            }
+            i++;
+        });
+
+        Debug.Log("TCPServer: sent Message: " + message);
+        addTextToServerConsole("Server: sent Message: " + message);
+    }
+
+    public static void sendObjectToClients<T>(string classObjectMethodToCall, T objectToSerialize)
+    {
         string serializedObject = Methods.SerializeObject(objectToSerialize);
 
-        MyTCPServer.sendMessageToClients(classToCall, objectToCall, method, serializedObject);
+        MyTCPServer.sendMessageToClients(classObjectMethodToCall, serializedObject);
     }
 
     private static void startClientHandlingThread()
@@ -208,8 +199,7 @@ public static class MyTCPServer
             MultiplayerManagerServer.connectedIpAddresses.Add(connectedIp);
 
             Debug.Log("Server ClientHandling Thread: Client Added!");
-            Boolean clientConnected = serverToClientClient.Connected;
-            while (clientConnected)
+            while (serverToClientClient.Connected)
             {
                 // if (serverToClientStream.DataAvailable)
                 // {
@@ -228,6 +218,23 @@ public static class MyTCPServer
         finally
         {
             Debug.Log("Server ClientHandling Thread: stopped");
+            MyTCPServer.sendMessageToClients(
+                Messages.Server.MultiplayerManager.ConnectedPlayers.disconnect,
+                "true"
+            );
+            MultiplayerManagerServer.serverToClientStreams.ForEach(
+                (serverToClientStream) =>
+                {
+                    serverToClientStream.Dispose();
+                }
+            );
+            MultiplayerManagerServer.serverToClientClients.ForEach(
+                (serverToClientClient) =>
+                {
+                    serverToClientClient.Dispose();
+                }
+            );
+            server.Stop();
         }
     }
 

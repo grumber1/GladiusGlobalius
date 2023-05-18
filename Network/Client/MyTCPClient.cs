@@ -23,28 +23,10 @@ public static class MyTCPClient
         Debug.Log("Client Thread: ReadIncomingNetworkTraffic started");
     }
 
-    public static void sendMessageToServer(
-        string classToCall,
-        string objectToCall,
-        string method,
-        string value
-    )
-    {
-        string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
-        message = message + ":::::::";
-        byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
-
-        sendByteSizeToServer(msg);
-
-        Debug.Log("TCPClient: Trying to send message with " + msg.Length + " bytes");
-        MultiplayerManagerClient.clientToServerStream.Write(msg, 0, msg.Length);
-        Debug.Log("TCPClient: sent Message: " + message);
-    }
-
     public static void sendByteSizeToServer(byte[] originalMessageInBytes)
     {
-        string classToCallByteSizeMessage = "MyTCPServer";
-        string objectToCallByteSizeMessage = "MessageByteSizeToReceive";
+        string classToCallByteSizeMessage = "myTCPServer";
+        string objectToCallByteSizeMessage = "messageByteSizeToReceive";
         string methodByteSizeMessage = "set";
         string valueByteSizeMessage = originalMessageInBytes.Length.ToString();
         string byteSizeMessage =
@@ -84,19 +66,28 @@ public static class MyTCPClient
         );
     }
 
-    public static void sendObjectToServer<T>(
-        string classToCall,
-        string objectToCall,
-        string method,
-        T objectToSerialize
-    )
+    public static void sendMessageToServer(string classObjectMethodToCall, string value)
     {
-        string messageWithoutValue =
-            classToCall + "::::::" + objectToCall + ":::::" + method + "::::";
+        string classToCall = classObjectMethodToCall.Split(".")[0];
+        string objectToCall = classObjectMethodToCall.Split(".")[1];
+        string method = classObjectMethodToCall.Split(".")[2];
 
+        string message = classToCall + "::::::" + objectToCall + ":::::" + method + "::::" + value;
+        message = message + ":::::::";
+        byte[] msg = System.Text.Encoding.ASCII.GetBytes(message);
+
+        sendByteSizeToServer(msg);
+
+        Debug.Log("TCPClient: Trying to send message with " + msg.Length + " bytes");
+        MultiplayerManagerClient.clientToServerStream.Write(msg, 0, msg.Length);
+        Debug.Log("TCPClient: sent Message: " + message);
+    }
+
+    public static void sendObjectToServer<T>(string classObjectMethodToCall, T objectToSerialize)
+    {
         string serializedObject = Methods.SerializeObject(objectToSerialize);
 
-        MyTCPClient.sendMessageToServer(classToCall, objectToCall, method, serializedObject);
+        MyTCPClient.sendMessageToServer(classObjectMethodToCall, serializedObject);
     }
 
     private static void startReadIncomingNetworkTrafficThread()
@@ -130,7 +121,7 @@ public static class MyTCPClient
                 );
                 byteSizeForMessageToReceive = DevSettings.standardByteSize;
                 Debug.Log("TCPClient: received message: " + receivedMessage);
-                Debug.Log("TCPServer: received message has " + bytes.Length + " bytes");
+                Debug.Log("TCPClient: received message has " + bytes.Length + " bytes");
                 TCPMessageHandlerClient.handleMessage(receivedMessage);
             }
         }
@@ -138,9 +129,7 @@ public static class MyTCPClient
         {
             Debug.Log("Client readIncomingNetworkTraffic Thread: Error");
             MyTCPClient.sendMessageToServer(
-                "MultiplayerManager",
-                "connectedPlayers",
-                "disconnectPlayer",
+                Messages.Client.MultiplayerManager.ConnectedPlayers.disconnectPlayer,
                 MultiplayerManagerClient.player.id
             );
 

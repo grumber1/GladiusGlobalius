@@ -45,7 +45,10 @@ public class Server : MonoBehaviour
 
     public void onClickStartGame()
     {
-        MyTCPServer.sendMessageToClients("MultiplayerManager", "startGameButton", "set", "true");
+        MyTCPServer.sendMessageToClients(
+            Messages.Server.MultiplayerManager.StartGameButton.set,
+            "true"
+        );
         runningServerGO.SetActive(true);
     }
 }

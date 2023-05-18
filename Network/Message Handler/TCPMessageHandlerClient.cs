@@ -29,15 +29,15 @@ public static class TCPMessageHandlerClient
     {
         switch (classToCall)
         {
-            case "MultiplayerManager":
+            case "multiplayerManager":
                 multiplayerManager(objectToCall, method, value);
                 break;
 
-            case "MultiplayerSlaveMarket":
+            case "multiplayerSlaveMarket":
                 multiplayerSlaveMarket(objectToCall, method, value);
                 break;
 
-            case "MyTCPClient":
+            case "myTCPClient":
                 myTCPClient(objectToCall, method, value);
                 break;
         }
@@ -51,68 +51,84 @@ public static class TCPMessageHandlerClient
                 connectedPlayers(method, value);
                 break;
 
+                static void connectedPlayers(string method, string value)
+                {
+                    switch (method)
+                    {
+                        case "syncConnectedPlayers":
+                            syncConnectedPlayers(method, value);
+                            break;
+
+                            static void syncConnectedPlayers(
+                                string method,
+                                string connectedPlayersSerializedString
+                            )
+                            {
+                                Debug.Log(
+                                    "TCP Message Handler Client: calling "
+                                        + method
+                                        + "."
+                                        + connectedPlayersSerializedString
+                                );
+
+                                List<Player> connectedPlayers = Methods.DeserializeObject<
+                                    List<Player>
+                                >(connectedPlayersSerializedString);
+
+                                MultiplayerManagerClient.connectedPlayers = connectedPlayers;
+
+                                Player playerById = Methods.getPlayerByIdClient(
+                                    MultiplayerManagerClient.player.id
+                                );
+                                MultiplayerManagerClient.player = playerById;
+                            }
+                        case "disconnectPlayer":
+                            disconnectPlayer(method, value);
+                            break;
+
+                            static void disconnectPlayer(string method, string notNeededValue)
+                            {
+                                Debug.Log(
+                                    "TCP Message Handler Client: calling "
+                                        + method
+                                        + "."
+                                        + notNeededValue
+                                );
+
+                                MultiplayerManagerClient.clientToServerStream.Dispose();
+                                MultiplayerManagerClient.clientToServerClient.Dispose();
+                            }
+                    }
+                }
+
             case "startGameButton":
                 startGameButton(method, value);
                 break;
-        }
 
-        static void connectedPlayers(string method, string value)
-        {
-            switch (method)
-            {
-                case "syncConnectedPlayers":
-                    syncConnectedPlayers(method, value);
-                    break;
-
-                    static void syncConnectedPlayers(
-                        string method,
-                        string connectedPlayersSerializedString
-                    )
+                static void startGameButton(string method, string value)
+                {
+                    switch (method)
                     {
-                        Debug.Log(
-                            "TCP Message Handler Client: calling "
-                                + method
-                                + "."
-                                + connectedPlayersSerializedString
-                        );
+                        case "set":
+                            set(method, value);
+                            break;
 
-                        List<Player> connectedPlayers = Methods.DeserializeObject<List<Player>>(
-                            connectedPlayersSerializedString
-                        );
+                            static void set(string method, string startGameButtonValue)
+                            {
+                                Debug.Log(
+                                    "TCP Message Handler Client: calling "
+                                        + method
+                                        + "."
+                                        + startGameButtonValue
+                                );
 
-                        MultiplayerManagerClient.connectedPlayers = connectedPlayers;
-
-                        Player playerById = Methods.getPlayerByIdClient(
-                            MultiplayerManagerClient.player.id
-                        );
-                        MultiplayerManagerClient.player = playerById;
+                                if (startGameButtonValue == "true")
+                                {
+                                    MultiplayerManagerClient.startGameButton = true;
+                                }
+                            }
                     }
-            }
-        }
-
-        static void startGameButton(string method, string value)
-        {
-            switch (method)
-            {
-                case "set":
-                    set(method, value);
-                    break;
-
-                    static void set(string method, string startGameButtonValue)
-                    {
-                        Debug.Log(
-                            "TCP Message Handler Client: calling "
-                                + method
-                                + "."
-                                + startGameButtonValue
-                        );
-
-                        if (startGameButtonValue == "true")
-                        {
-                            MultiplayerManagerClient.startGameButton = true;
-                        }
-                    }
-            }
+                }
         }
     }
 
@@ -123,32 +139,35 @@ public static class TCPMessageHandlerClient
             case "availableSlaves":
                 availableSlaves(method, value);
                 break;
-        }
 
-        static void availableSlaves(string method, string value)
-        {
-            switch (method)
-            {
-                case "syncAvailableSlaves":
-                    syncAvailableSlaves(method, value);
-                    break;
-
-                    static void syncAvailableSlaves(string method, string availableSlavesSerialized)
+                static void availableSlaves(string method, string value)
+                {
+                    switch (method)
                     {
-                        Debug.Log(
-                            "TCP Message Handler Client: calling "
-                                + method
-                                + "."
-                                + availableSlavesSerialized
-                        );
+                        case "syncAvailableSlaves":
+                            syncAvailableSlaves(method, value);
+                            break;
 
-                        List<Gladiator> availableSlaves = Methods.DeserializeObject<
-                            List<Gladiator>
-                        >(availableSlavesSerialized);
+                            static void syncAvailableSlaves(
+                                string method,
+                                string availableSlavesSerialized
+                            )
+                            {
+                                Debug.Log(
+                                    "TCP Message Handler Client: calling "
+                                        + method
+                                        + "."
+                                        + availableSlavesSerialized
+                                );
 
-                        MultiplayerSlaveMarketClient.availableSlaves = availableSlaves;
+                                List<Gladiator> availableSlaves = Methods.DeserializeObject<
+                                    List<Gladiator>
+                                >(availableSlavesSerialized);
+
+                                MultiplayerSlaveMarketClient.availableSlaves = availableSlaves;
+                            }
                     }
-            }
+                }
         }
     }
 
@@ -156,32 +175,35 @@ public static class TCPMessageHandlerClient
     {
         switch (objectToCall)
         {
-            case "MessageByteSizeToReceive":
+            case "messageByteSizeToReceive":
                 messageByteSizeToReceive(method, value);
                 break;
-        }
 
-        static void messageByteSizeToReceive(string method, string value)
-        {
-            switch (method)
-            {
-                case "set":
-                    setMessageByteSize(method, value);
-                    break;
-
-                    static void setMessageByteSize(string method, string byteSizeString)
+                static void messageByteSizeToReceive(string method, string value)
+                {
+                    switch (method)
                     {
-                        Debug.Log(
-                            "TCP Message Handler Client: calling " + method + "." + byteSizeString
-                        );
+                        case "set":
+                            setMessageByteSize(method, value);
+                            break;
 
-                        byteSizeString = byteSizeString.Trim();
-                        int byteSize = Int32.Parse(byteSizeString);
+                            static void setMessageByteSize(string method, string byteSizeString)
+                            {
+                                Debug.Log(
+                                    "TCP Message Handler Client: calling "
+                                        + method
+                                        + "."
+                                        + byteSizeString
+                                );
 
-                        MyTCPClient.byteSizeForMessageToReceive = byteSize;
-                        Debug.Log("TCPClient: set byteSize to " + byteSize + " bytes");
+                                byteSizeString = byteSizeString.Trim();
+                                int byteSize = Int32.Parse(byteSizeString);
+
+                                MyTCPClient.byteSizeForMessageToReceive = byteSize;
+                                Debug.Log("TCPClient: set byteSize to " + byteSize + " bytes");
+                            }
                     }
-            }
+                }
         }
     }
 
@@ -192,27 +214,30 @@ public static class TCPMessageHandlerClient
             case "objectToCall":
                 messageByteSizeToReceive(method, value);
                 break;
-        }
 
-        static void messageByteSizeToReceive(string method, string value)
-        {
-            switch (method)
-            {
-                case "method":
-                    setMessageByteSize(method, value);
-                    break;
-
-                    static void setMessageByteSize(string method, string byteSizeString)
+                static void messageByteSizeToReceive(string method, string value)
+                {
+                    switch (method)
                     {
-                        Debug.Log(
-                            "TCP Message Handler Client: calling " + method + "." + byteSizeString
-                        );
+                        case "method":
+                            setMessageByteSize(method, value);
+                            break;
 
-                        int byteSize = Int32.Parse(byteSizeString);
+                            static void setMessageByteSize(string method, string byteSizeString)
+                            {
+                                Debug.Log(
+                                    "TCP Message Handler Client: calling "
+                                        + method
+                                        + "."
+                                        + byteSizeString
+                                );
 
-                        MyTCPClient.byteSizeForMessageToReceive = byteSize;
+                                int byteSize = Int32.Parse(byteSizeString);
+
+                                MyTCPClient.byteSizeForMessageToReceive = byteSize;
+                            }
                     }
-            }
+                }
         }
     }
 }

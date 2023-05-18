@@ -53,9 +53,7 @@ public class Multiplayer : MonoBehaviour
         MyTCPClient.TCPClient(ip);
 
         MyTCPClient.sendObjectToServer(
-            "MultiplayerManager",
-            "connectedPlayers",
-            "addNewPlayer",
+            Messages.Client.MultiplayerManager.ConnectedPlayers.addNewPlayer,
             newPlayer
         );
         // TODO evtl mehr Daten mitschicken? Ip, etc..

@@ -30,16 +30,16 @@ public static class TCPMessageHandlerServer
     {
         switch (classToCall)
         {
-            case "MultiplayerManager":
+            case "multiplayerManager":
                 multiplayerManager(objectToCall, method, value);
                 break;
 
-            case "MyTCPServer":
-                myTCPServer(objectToCall, method, value);
+            case "multiplayerSlaveMarket":
+                multiplayerSlaveMarket(objectToCall, method, value);
                 break;
 
-            case "MultiplayerSlaveMarket":
-                multiplayerSlaveMarket(objectToCall, method, value);
+            case "myTCPServer":
+                myTCPServer(objectToCall, method, value);
                 break;
         }
     }
@@ -88,9 +88,11 @@ public static class TCPMessageHandlerServer
                         );
 
                         MyTCPServer.sendObjectToClients(
-                            "MultiplayerManager",
-                            "connectedPlayers",
-                            "syncConnectedPlayers",
+                            Messages
+                                .Server
+                                .MultiplayerManager
+                                .ConnectedPlayers
+                                .syncConnectedPlayers,
                             MultiplayerManagerServer.connectedPlayers
                         );
                     }
@@ -112,44 +114,13 @@ public static class TCPMessageHandlerServer
                         MultiplayerManagerServer.serverToClientStreams.RemoveAt(playerIndex);
 
                         MyTCPServer.sendObjectToClients(
-                            "MultiplayerManager",
-                            "connectedPlayers",
-                            "syncConnectedPlayers",
+                            Messages
+                                .Server
+                                .MultiplayerManager
+                                .ConnectedPlayers
+                                .syncConnectedPlayers,
                             MultiplayerManagerServer.connectedPlayers
                         );
-                    }
-            }
-        }
-    }
-
-    private static void myTCPServer(string objectToCall, string method, string value)
-    {
-        switch (objectToCall)
-        {
-            case "MessageByteSizeToReceive":
-                messageByteSizeToReceive(method, value);
-                break;
-        }
-
-        static void messageByteSizeToReceive(string method, string value)
-        {
-            switch (method)
-            {
-                case "set":
-                    setMessageByteSize(method, value);
-                    break;
-
-                    static void setMessageByteSize(string method, string byteSizeString)
-                    {
-                        Debug.Log(
-                            "TCP Message Handler Client: calling " + method + "." + byteSizeString
-                        );
-
-                        byteSizeString = byteSizeString.Trim();
-                        int byteSize = Int32.Parse(byteSizeString);
-
-                        MyTCPServer.byteSizeForMessageToReceive = byteSize;
-                        Debug.Log("TCPServer: set byteSize to " + byteSize + " bytes");
                     }
             }
         }
@@ -206,18 +177,55 @@ public static class TCPMessageHandlerServer
                         );
 
                         MyTCPServer.sendObjectToClients(
-                            "MultiplayerManager",
-                            "connectedPlayers",
-                            "syncConnectedPlayers",
+                            Messages
+                                .Server
+                                .MultiplayerManager
+                                .ConnectedPlayers
+                                .syncConnectedPlayers,
                             MultiplayerManagerServer.connectedPlayers
                         );
 
                         MyTCPServer.sendObjectToClients(
-                            "MultiplayerSlaveMarket",
-                            "availableSlaves",
-                            "syncAvailableSlaves",
+                            Messages
+                                .Server
+                                .MultiplayerSlaveMarket
+                                .AvailableSlaves
+                                .syncAvailableSlaves,
                             MultiplayerSlaveMarketServer.availableSlaves
                         );
+                    }
+            }
+        }
+    }
+
+    private static void myTCPServer(string objectToCall, string method, string value)
+    {
+        switch (objectToCall)
+        {
+            case "messageByteSizeToReceive":
+                messageByteSizeToReceive(method, value);
+                break;
+        }
+
+        static void messageByteSizeToReceive(string method, string value)
+        {
+            switch (method)
+            {
+                case "set":
+                    setMessageByteSize(method, value);
+                    break;
+
+                    static void setMessageByteSize(string method, string byteSizeString)
+                    {
+                        Debug.Log(
+                            "TCP Message Handler Client: calling " + method + "." + byteSizeString
+                        );
+
+                        byteSizeString = byteSizeString.Trim();
+                        int byteSize = Int32.Parse(byteSizeString);
+
+                        MyTCPServer.byteSizeForMessageToReceive = byteSize;
+                        Debug.Log("TCPServer: set byteSize to " + byteSize + " bytes");
                     }
             }
         }

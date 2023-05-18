@@ -23,9 +23,7 @@ public class SlaveMarket : MonoBehaviour
         ].id;
 
         MyTCPClient.sendMessageToServer(
-            "MultiplayerSlaveMarket",
-            "availableSlaves",
-            "buySlave",
+            Messages.Client.MultiplayerSlaveMarket.AvailableSlaves.buySlave,
             MultiplayerManagerClient.player.id + "::" + gladiatorToBuyId
         );
     }
