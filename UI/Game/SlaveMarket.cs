@@ -6,13 +6,13 @@ using UnityEngine;
 public class SlaveMarket : MonoBehaviour
 {
     public TMP_Dropdown availableSlaves;
+    public int previouslyAvailableSlaves = 0;
 
     void Start() { }
 
     void Update()
     {
-        List<string> availableSlavesString = getAvailableSlaves();
-        availableSlaves.AddOptions(availableSlavesString);
+        fillAvailableSlavesInDropDownIfChangesOccur();
     }
 
     public void onClickBuy()
@@ -27,19 +27,24 @@ public class SlaveMarket : MonoBehaviour
         );
     }
 
-    private List<string> getAvailableSlaves()
+    private void fillAvailableSlavesInDropDownIfChangesOccur()
     {
-        List<string> availableSlavesString = new List<string>();
+        if (
+            previouslyAvailableSlaves
+            != MultiplayerSlaveMarketClient.availableSlaves.ToArray().Length
+        )
+        {
+            List<string> availableSlavesString = new List<string>();
 
-        MultiplayerSlaveMarketClient.availableSlaves.ForEach(
-            (availableSlave) =>
-            {
-                availableSlavesString.Add(availableSlave.name);
-            }
-        );
-
-        availableSlaves.ClearOptions();
-
-        return availableSlavesString;
+            MultiplayerSlaveMarketClient.availableSlaves.ForEach(
+                (availableSlave) =>
+                {
+                    availableSlavesString.Add(availableSlave.name);
+                }
+            );
+            previouslyAvailableSlaves = availableSlavesString.ToArray().Length;
+            availableSlaves.ClearOptions();
+            availableSlaves.AddOptions(availableSlavesString);
+        }
     }
 }

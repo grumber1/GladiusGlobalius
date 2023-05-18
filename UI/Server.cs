@@ -10,13 +10,13 @@ public class Server : MonoBehaviour
     public GameObject ServerGO;
     public GameObject GameGO;
     public GameObject runningServerGO;
+    public GameObject startOfANewGame;
     public TMP_Text terminal;
     public TMP_Text serverInfo;
     public double connectedPlayersCount;
 
     void BeforeStart() { }
 
-    // Update is called once per frame
     void Update()
     {
         terminal.text = MyTCPServer.content.Replace("\r", "\n").Replace("\n\n", "\n");
@@ -49,6 +49,7 @@ public class Server : MonoBehaviour
             Messages.Server.MultiplayerManager.StartGameButton.set,
             "true"
         );
+        startOfANewGame.SetActive(true);
         runningServerGO.SetActive(true);
     }
 }

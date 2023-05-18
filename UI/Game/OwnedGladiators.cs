@@ -6,28 +6,37 @@ using UnityEngine;
 public class OwnedGladiators : MonoBehaviour
 {
     public TMP_Dropdown availableGladiators;
+    public int previouslyAvailableGladiators = 0;
 
-    void Start() { }
+    void Start()
+    {
+        availableGladiators.ClearOptions();
+    }
 
     void Update()
     {
-        List<string> availableSlavesString = getAvailableGladiators();
-        availableGladiators.AddOptions(availableSlavesString);
+        fillAvailableGladiatorsInDropDownIfChangesOccur();
     }
 
-    private List<string> getAvailableGladiators()
+    private void fillAvailableGladiatorsInDropDownIfChangesOccur()
     {
-        List<string> availableGladiatorsString = new List<string>();
+        if (
+            previouslyAvailableGladiators
+            != MultiplayerManagerClient.player.ownedGladiators.ToArray().Length
+        )
+        {
+            List<string> availableGladiatorsString = new List<string>();
 
-        MultiplayerManagerClient.player.ownedGladiators.ForEach(
-            (availableGladiator) =>
-            {
-                availableGladiatorsString.Add(availableGladiator.name);
-            }
-        );
+            MultiplayerManagerClient.player.ownedGladiators.ForEach(
+                (availableGladiator) =>
+                {
+                    availableGladiatorsString.Add(availableGladiator.name);
+                }
+            );
 
-        availableGladiators.ClearOptions();
-
-        return availableGladiatorsString;
+            previouslyAvailableGladiators = availableGladiatorsString.ToArray().Length;
+            availableGladiators.ClearOptions();
+            availableGladiators.AddOptions(availableGladiatorsString);
+        }
     }
 }

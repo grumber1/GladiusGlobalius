@@ -12,8 +12,6 @@ public class beforeStart : MonoBehaviour
     public GameObject SlaveMarketGO;
     public GameObject OwnedGladiatorsGO;
 
-    // Start is called before the first frame update
-
     void Awake()
     {
         MainMenuGO.SetActive(true);
@@ -27,6 +25,5 @@ public class beforeStart : MonoBehaviour
 
     void Start() { }
 
-    // Update is called once per frame
     void Update() { }
 }

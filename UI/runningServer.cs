@@ -6,12 +6,18 @@ using UnityEngine;
 public class runningServer : MonoBehaviour
 {
     void Start()
-    // Fill Slave Market and send to network
+    {
+        fillSlaveMarket();
+    }
+
+    void Update() { }
+
+    private void fillSlaveMarket()
     {
         for (int i = 0; i < 5; i++)
         {
             Gladiator gladiator = Methods.createNewGladiator(
-                "RusselCrow",
+                GladiatorNameGenerator.generateGladiatorName(),
                 75,
                 10,
                 Weapons.fist,
@@ -25,6 +31,4 @@ public class runningServer : MonoBehaviour
             MultiplayerSlaveMarketServer.availableSlaves
         );
     }
-
-    void Update() { }
 }
