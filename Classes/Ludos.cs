@@ -16,6 +16,7 @@ public class Ludos
     //Constructor
     public Ludos(string newName)
     {
-        this.name = newName;
+        this.name = newName.Replace("\r", "").Replace("\n", "");
+        ;
     }
 }

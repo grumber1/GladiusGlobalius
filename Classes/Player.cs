@@ -20,7 +20,7 @@ public class Player
     public Player(string newId, string newName, int newGold = 3000)
     {
         id = newId;
-        name = newName;
+        name = newName.Replace("\r", "").Replace("\n", "");
         gold = newGold;
     }
 }

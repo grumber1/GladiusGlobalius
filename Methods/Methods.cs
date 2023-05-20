@@ -173,4 +173,11 @@ public static class Methods
 
         return newGladiator;
     }
+
+    public static string firstLetterToUppercase(string input)
+    {
+        string result = input.Substring(0, 1).ToUpper() + input.Substring(1);
+
+        return result;
+    }
 }

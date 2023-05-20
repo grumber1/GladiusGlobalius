@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public static class GladiatorNameGenerator
 {
@@ -12,8 +13,10 @@ public static class GladiatorNameGenerator
 
         randomNumber = Methods.randomNumber(0, nachnamen.Length - 1);
         string gladiatorNachname = nachnamen[randomNumber];
+        string gladiatorFullName = (gladiatorVorname + " " + gladiatorNachname).Replace("\n", "");
+        Debug.Log("gladiatorFullName: " + gladiatorFullName);
 
-        return gladiatorVorname + " " + gladiatorNachname;
+        return gladiatorFullName;
     }
 
     public static List<string> generateGladiatorNames(int count)

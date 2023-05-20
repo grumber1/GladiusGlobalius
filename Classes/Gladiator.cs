@@ -25,7 +25,7 @@ public class Gladiator
     )
     {
         this.id = newId;
-        this.name = newName;
+        this.name = newName.Replace("\r", "").Replace("\n", "");
         this.body = newBody;
         this.attributes = newAttributes;
         this.weapons = newWeapons;
