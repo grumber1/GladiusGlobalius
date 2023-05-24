@@ -2,18 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class runningServer : MonoBehaviour
+public class DailyRoutineServer : MonoBehaviour
 {
     void Start()
     {
-        fillSlaveMarket();
+        Debug.Log("DailyRoutineServer Active");
+        fillSlaveMarketAndSyncWithPlayers();
     }
 
-    void Update() { }
-
-    private void fillSlaveMarket()
+    private void fillSlaveMarketAndSyncWithPlayers()
     {
+        MultiplayerSlaveMarketServer.availableSlaves.Clear();
         for (int i = 0; i < 5; i++)
         {
             Gladiator gladiator = Methods.createNewGladiator(

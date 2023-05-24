@@ -14,4 +14,5 @@ public static class MultiplayerManagerClient
     public static bool isServer = false;
     public static bool startGameButton = false;
     public static string remoteIp;
+    public static int day = 0;
 }

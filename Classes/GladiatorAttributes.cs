@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -13,16 +14,25 @@ public class GladiatorAttributes
     public GladiatorAttributes() { }
 
     //Constructor
-    public GladiatorAttributes(
-        double newAgility = 10,
-        double newStrength = 10,
-        double newAttack = 10,
-        double newDefense = 10
-    )
+    public GladiatorAttributes(double baseAttributes)
     {
-        this.agility = newAgility;
-        this.strength = newStrength;
-        this.attack = newAttack;
-        this.defense = newDefense;
+        int minValue = 50;
+        int maxValue = 200;
+
+        double randomNumber = Methods.randomNumber(minValue, maxValue);
+        randomNumber = randomNumber / 100;
+        this.agility = Math.Round((baseAttributes) * randomNumber, 2);
+
+        randomNumber = Methods.randomNumber(minValue, maxValue);
+        randomNumber = randomNumber / 100;
+        this.strength = Math.Round((baseAttributes) * randomNumber, 2);
+
+        randomNumber = Methods.randomNumber(minValue, maxValue);
+        randomNumber = randomNumber / 100;
+        this.attack = Math.Round((baseAttributes) * randomNumber, 2);
+
+        randomNumber = Methods.randomNumber(minValue, maxValue);
+        randomNumber = randomNumber / 100;
+        this.defense = Math.Round((baseAttributes) * randomNumber, 2);
     }
 }

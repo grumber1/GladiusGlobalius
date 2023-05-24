@@ -10,11 +10,6 @@ public class Lobby : MonoBehaviour
     public GameObject GameGO;
     public TMP_Text connectedPlayersText;
 
-    void Start()
-    {
-        MultiplayerManagerClient.startGameButton = false;
-    }
-
     void Update()
     {
         updateConnectedPlayers();

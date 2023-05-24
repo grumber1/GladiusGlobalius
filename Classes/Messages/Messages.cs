@@ -21,6 +21,11 @@ public static class Messages
             {
                 public static string set = "multiplayerManager.startGameButton.set";
             }
+
+            public static class Day
+            {
+                public static string set = "multiplayerManager.day.set";
+            }
         }
 
         public static class MultiplayerSlaveMarket
@@ -44,6 +49,8 @@ public static class Messages
 
                 public static string addNewPlayer =
                     "multiplayerManager.connectedPlayers.addNewPlayer";
+
+                public static string syncPlayer = "multiplayerManager.connectedPlayers.syncPlayer";
             }
         }
 

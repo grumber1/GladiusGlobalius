@@ -61,10 +61,6 @@ public static class TCPMessageHandlerServer
                     addNewPlayer(method, value);
                     break;
 
-                case "disconnectPlayer":
-                    disconnectPlayer(method, value);
-                    break;
-
                     static void addNewPlayer(string method, string newPlayerSerialized)
                     {
                         Debug.Log(
@@ -87,15 +83,12 @@ public static class TCPMessageHandlerServer
                             MultiplayerManagerServer.connectedPlayers
                         );
 
-                        MyTCPServer.sendObjectToClients(
-                            Messages
-                                .Server
-                                .MultiplayerManager
-                                .ConnectedPlayers
-                                .syncConnectedPlayers,
-                            MultiplayerManagerServer.connectedPlayers
-                        );
+                        syncPlayers();
                     }
+
+                case "disconnectPlayer":
+                    disconnectPlayer(method, value);
+                    break;
 
                     static void disconnectPlayer(string method, string playerId)
                     {
@@ -113,14 +106,26 @@ public static class TCPMessageHandlerServer
                         MultiplayerManagerServer.serverToClientStreams[playerIndex].Dispose();
                         MultiplayerManagerServer.serverToClientStreams.RemoveAt(playerIndex);
 
-                        MyTCPServer.sendObjectToClients(
-                            Messages
-                                .Server
-                                .MultiplayerManager
-                                .ConnectedPlayers
-                                .syncConnectedPlayers,
-                            MultiplayerManagerServer.connectedPlayers
+                        syncPlayers();
+                    }
+
+                case "syncPlayer":
+                    syncPlayer(method, value);
+                    break;
+
+                    static void syncPlayer(string method, string playerSerialized)
+                    {
+                        Player playerToLookFor = Methods.DeserializeObject<Player>(
+                            playerSerialized
                         );
+
+                        int index = MultiplayerManagerServer.connectedPlayers.FindIndex(
+                            player => player.id == playerToLookFor.id
+                        );
+
+                        MultiplayerManagerServer.connectedPlayers[index] = playerToLookFor;
+
+                        syncPlayers();
                     }
             }
         }
@@ -165,34 +170,13 @@ public static class TCPMessageHandlerServer
                                 gladiator => gladiator.id == gladiatorId
                             );
 
-                        // Set OwnerId for selected Gladiator
-                        foundGladiator.ownedBy = playerId;
+                        foundGladiator.ownedById = playerId;
+                        foundGladiator.ownedByName = foundPlayer.name;
                         foundPlayer.ownedGladiators.Add(foundGladiator);
-                        Debug.Log(
-                            "1: " + MultiplayerSlaveMarketServer.availableSlaves.ToArray().Length
-                        );
                         MultiplayerSlaveMarketServer.availableSlaves.Remove(foundGladiator);
-                        Debug.Log(
-                            "2: " + MultiplayerSlaveMarketServer.availableSlaves.ToArray().Length
-                        );
 
-                        MyTCPServer.sendObjectToClients(
-                            Messages
-                                .Server
-                                .MultiplayerManager
-                                .ConnectedPlayers
-                                .syncConnectedPlayers,
-                            MultiplayerManagerServer.connectedPlayers
-                        );
-
-                        MyTCPServer.sendObjectToClients(
-                            Messages
-                                .Server
-                                .MultiplayerSlaveMarket
-                                .AvailableSlaves
-                                .syncAvailableSlaves,
-                            MultiplayerSlaveMarketServer.availableSlaves
-                        );
+                        syncPlayers();
+                        syncAvailableSlaves();
                     }
             }
         }
@@ -260,5 +244,22 @@ public static class TCPMessageHandlerServer
                     }
             }
         }
+    }
+
+    //Common Methods
+    private static void syncPlayers()
+    {
+        MyTCPServer.sendObjectToClients(
+            Messages.Server.MultiplayerManager.ConnectedPlayers.syncConnectedPlayers,
+            MultiplayerManagerServer.connectedPlayers
+        );
+    }
+
+    private static void syncAvailableSlaves()
+    {
+        MyTCPServer.sendObjectToClients(
+            Messages.Server.MultiplayerSlaveMarket.AvailableSlaves.syncAvailableSlaves,
+            MultiplayerSlaveMarketServer.availableSlaves
+        );
     }
 }

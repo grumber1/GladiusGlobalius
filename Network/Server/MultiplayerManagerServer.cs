@@ -15,4 +15,5 @@ public static class MultiplayerManagerServer
     public static List<TcpClient> serverToClientClients = new List<TcpClient>();
     public static List<Stream> serverToClientStreams = new List<Stream>();
     public static List<string> generatedGladiatorNames = new List<string>();
+    public static int day = 0;
 }

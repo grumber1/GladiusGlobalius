@@ -9,7 +9,8 @@ public class Server : MonoBehaviour
 {
     public GameObject ServerGO;
     public GameObject GameGO;
-    public GameObject runningServerGO;
+    public GameObject DailyRoutineServerGO;
+    public GameObject ServerGameHandlingGO;
     public GameObject startOfANewGame;
     public TMP_Text terminal;
     public TMP_Text serverInfo;
@@ -19,9 +20,29 @@ public class Server : MonoBehaviour
 
     void Update()
     {
-        terminal.text = MyTCPServer.content.Replace("\r", "\n").Replace("\n\n", "\n");
-        connectedPlayersCount = MultiplayerManagerServer.connectedPlayers.ToArray().Length;
+        updateTerminal();
+        updateServerInfo();
+    }
 
+    public void onClickStartGame()
+    {
+        MyTCPServer.sendMessageToClients(
+            Messages.Server.MultiplayerManager.StartGameButton.set,
+            "true"
+        );
+        startOfANewGame.SetActive(true);
+        ServerGameHandlingGO.SetActive(true);
+        DailyRoutineServerGO.SetActive(true);
+    }
+
+    private void updateTerminal()
+    {
+        terminal.text = MyTCPServer.content.Replace("\r", "\n").Replace("\n\n", "\n");
+    }
+
+    private void updateServerInfo()
+    {
+        connectedPlayersCount = MultiplayerManagerServer.connectedPlayers.ToArray().Length;
         string serverInfoText = "Server: \n";
         string connectedPlayersText = "ConnectedPlayers: " + connectedPlayersCount + "\n";
         string clientHandlingThreadsText =
@@ -32,7 +53,6 @@ public class Server : MonoBehaviour
             "Clients: " + MultiplayerManagerServer.serverToClientClients.ToArray().Length + "\n";
         string serverToClientStreamsText =
             "Streams: " + MultiplayerManagerServer.serverToClientStreams.ToArray().Length + "\n";
-
         string content =
             serverInfoText
             + connectedPlayersText
@@ -40,16 +60,5 @@ public class Server : MonoBehaviour
             + serverToClientClientsText
             + serverToClientStreamsText;
         serverInfo.text = content.Replace("\r", "\n").Replace("\n\n", "\n");
-        ;
-    }
-
-    public void onClickStartGame()
-    {
-        MyTCPServer.sendMessageToClients(
-            Messages.Server.MultiplayerManager.StartGameButton.set,
-            "true"
-        );
-        startOfANewGame.SetActive(true);
-        runningServerGO.SetActive(true);
     }
 }

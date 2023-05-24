@@ -17,10 +17,10 @@ public class OwnedGladiators : MonoBehaviour
     void Update()
     {
         fillAvailableGladiatorsInDropDownIfChangesOccur();
-        getGladiatorDetailsText();
+        fillGladiatorDetails();
     }
 
-    private void getGladiatorDetailsText()
+    private void fillGladiatorDetails()
     {
         string gladiatorDetails = "";
         if (MultiplayerManagerClient.player.ownedGladiators.ToArray().Length != 0)
@@ -32,7 +32,7 @@ public class OwnedGladiators : MonoBehaviour
                 ];
 
                 string selectedGladiatorName = selectedGladiator.name;
-                string selectedGladiatorOwnedBy = selectedGladiator.ownedBy;
+                string selectedGladiatorOwnedBy = selectedGladiator.ownedByName;
                 string selectedGladiatorLeftHandWeapon =
                     selectedGladiator.weapons.leftArmWeapon.name
                     + " - Damage: "

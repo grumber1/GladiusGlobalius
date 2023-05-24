@@ -129,6 +129,34 @@ public static class TCPMessageHandlerClient
                             }
                     }
                 }
+
+            case "day":
+                day(method, value);
+                break;
+
+                static void day(string method, string value)
+                {
+                    switch (method)
+                    {
+                        case "set":
+                            set(method, value);
+                            break;
+
+                            static void set(string method, string dayAsString)
+                            {
+                                Debug.Log(
+                                    "TCP Message Handler Client: calling "
+                                        + method
+                                        + "."
+                                        + dayAsString
+                                );
+
+                                int day = Int32.Parse(dayAsString);
+
+                                MultiplayerManagerClient.day = day;
+                            }
+                    }
+                }
         }
     }
 

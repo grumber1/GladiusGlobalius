@@ -9,15 +9,13 @@ public class SlaveMarket : MonoBehaviour
     public TMP_Text gladiatorDetailsText;
     public int previouslyAvailableSlaves = 0;
 
-    void Start() { }
-
     void Update()
     {
         fillAvailableSlavesInDropDownIfChangesOccur();
-        getGladiatorDetailsText();
+        fillGladiatorDetails();
     }
 
-    private void getGladiatorDetailsText()
+    private void fillGladiatorDetails()
     {
         string gladiatorDetails = "";
         if (MultiplayerSlaveMarketClient.availableSlaves.ToArray().Length != 0)
@@ -29,7 +27,7 @@ public class SlaveMarket : MonoBehaviour
                 ];
 
                 string selectedGladiatorName = selectedGladiator.name;
-                string selectedGladiatorOwnedBy = selectedGladiator.ownedBy;
+                string selectedGladiatorOwnedBy = selectedGladiator.ownedByName;
                 string selectedGladiatorLeftHandWeapon =
                     selectedGladiator.weapons.leftArmWeapon.name
                     + " - Damage: "

@@ -10,7 +10,8 @@ public class Gladiator
     public GladiatorBody body;
     public GladiatorAttributes attributes;
     public GladiatorWeapons weapons;
-    public string ownedBy;
+    public string ownedById;
+    public string ownedByName;
 
     public Gladiator() { }
 
@@ -21,7 +22,8 @@ public class Gladiator
         GladiatorBody newBody,
         GladiatorAttributes newAttributes,
         GladiatorWeapons newWeapons,
-        string newOwnedBy = "slaveTrader"
+        string newOwnedById = "000",
+        string newOwnedByName = "slaveTrader"
     )
     {
         this.id = newId;
@@ -29,6 +31,7 @@ public class Gladiator
         this.body = newBody;
         this.attributes = newAttributes;
         this.weapons = newWeapons;
-        this.ownedBy = newOwnedBy;
+        this.ownedById = newOwnedById;
+        this.ownedByName = newOwnedByName;
     }
 }

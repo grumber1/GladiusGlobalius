@@ -13,6 +13,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public class Multiplayer : MonoBehaviour
 {
+    public GameObject MainMenuGO;
     public GameObject MultiplayerGO;
     public GameObject LobbyGO;
     public GameObject ServerGO;
@@ -62,7 +63,14 @@ public class Multiplayer : MonoBehaviour
 
     public void onClickRefresh()
     {
+        localIps = getLocalIps();
+        insertLocalIpsIntoHostIpDropdown();
         insertLocalIpsIntoJoinIpDropdown();
+    }
+
+    public void onClickBack()
+    {
+        Methods.switchScreen(MultiplayerGO, MainMenuGO);
     }
 
     private void insertLocalIpsIntoJoinIpDropdown()

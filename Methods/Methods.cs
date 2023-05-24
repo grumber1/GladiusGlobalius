@@ -13,6 +13,8 @@ using System;
 
 public static class Methods
 {
+    private static System.Random rnd = new System.Random();
+
     public static void switchScreen(GameObject from, GameObject to)
     {
         from.SetActive(false);
@@ -65,10 +67,9 @@ public static class Methods
         return reachableIps;
     }
 
-    public static int randomNumber(int start, int end)
+    public static int randomNumber(int minValue, int maxValue)
     {
-        System.Random rnd = new System.Random();
-        int randomNumber = rnd.Next(start, end + 1);
+        int randomNumber = rnd.Next(minValue, maxValue + 1);
 
         return randomNumber;
     }
