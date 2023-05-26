@@ -8,6 +8,7 @@ public class SlaveMarket : MonoBehaviour
     public TMP_Dropdown availableSlaves;
     public TMP_Text gladiatorDetailsText;
     public int previouslyAvailableSlaves = 0;
+    public int previousDay = 0;
 
     void Update()
     {
@@ -109,7 +110,8 @@ public class SlaveMarket : MonoBehaviour
     {
         if (
             previouslyAvailableSlaves
-            != MultiplayerSlaveMarketClient.availableSlaves.ToArray().Length
+                != MultiplayerSlaveMarketClient.availableSlaves.ToArray().Length
+            || MultiplayerManagerClient.day != previousDay
         )
         {
             List<string> availableSlavesString = new List<string>();
@@ -121,6 +123,7 @@ public class SlaveMarket : MonoBehaviour
                 }
             );
             previouslyAvailableSlaves = availableSlavesString.ToArray().Length;
+            previousDay = MultiplayerManagerClient.day;
             availableSlaves.ClearOptions();
             availableSlaves.AddOptions(availableSlavesString);
         }

@@ -10,6 +10,7 @@ public class Game : MonoBehaviour
     public GameObject OwnedGladiatorsGO;
     public GameObject DailyRoutineClientGO;
     public GameObject FadeImageGO;
+    public TMP_Text playerDetailsText;
     public TMP_Text dayText;
     public Image fadeOutImage;
 
@@ -22,7 +23,8 @@ public class Game : MonoBehaviour
     void Update()
     {
         checkForNextDay();
-        dayText.text = MultiplayerManagerClient.day + "";
+        fillPlayerDetails();
+        dayText.text = "Day: " + MultiplayerManagerClient.day;
     }
 
     public void onClickSlaveMarket()
@@ -67,6 +69,14 @@ public class Game : MonoBehaviour
             DailyRoutineClientGO.SetActive(false);
             DailyRoutineClientGO.SetActive(true);
         }
+    }
+
+    private void fillPlayerDetails()
+    {
+        string playerText = "Name: " + MultiplayerManagerClient.player.name + "\n";
+        string goldText = "Gold: " + MultiplayerManagerClient.player.gold + "\n";
+
+        playerDetailsText.text = playerText + goldText;
     }
 
     IEnumerator fadeOut(GameObject FadeImageGO, Image image)

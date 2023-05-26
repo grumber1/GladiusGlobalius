@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class ServerGameHandling : MonoBehaviour
 {
+    void Start()
+    {
+        fillSlaveMarketAndSyncWithPlayers();
+    }
+
     void FixedUpdate()
     {
         checkForNextDay();
@@ -30,7 +35,7 @@ public class ServerGameHandling : MonoBehaviour
                     connectedPlayer.readyForNextRound = false;
                 }
             );
-            fillSlaveMarketAndSyncWithPlayers();
+            dailyRoutine();
 
             MultiplayerManagerServer.day += 1;
             MyTCPServer.sendMessageToClients(
@@ -38,6 +43,12 @@ public class ServerGameHandling : MonoBehaviour
                 MultiplayerManagerServer.day + ""
             );
         }
+    }
+
+    private void dailyRoutine()
+    {
+        fillSlaveMarketAndSyncWithPlayers();
+        calculatePlayerGoldAndSyncWithPlayers();
     }
 
     private void fillSlaveMarketAndSyncWithPlayers()
@@ -55,9 +66,17 @@ public class ServerGameHandling : MonoBehaviour
             MultiplayerSlaveMarketServer.availableSlaves.Add(gladiator);
         }
 
-        MyTCPServer.sendObjectToClients(
-            Messages.Server.MultiplayerSlaveMarket.AvailableSlaves.syncAvailableSlaves,
-            MultiplayerSlaveMarketServer.availableSlaves
+        TCPMessageHandlerServer.syncAvailableSlaves();
+    }
+
+    private void calculatePlayerGoldAndSyncWithPlayers()
+    {
+        MultiplayerManagerServer.connectedPlayers.ForEach(
+            (connectedPlayer) =>
+            {
+                connectedPlayer.gold += (int)(100 + 100 * connectedPlayer.mine.bonusInPercent);
+            }
         );
+        TCPMessageHandlerServer.syncPlayers();
     }
 }

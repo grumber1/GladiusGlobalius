@@ -247,7 +247,7 @@ public static class TCPMessageHandlerServer
     }
 
     //Common Methods
-    private static void syncPlayers()
+    public static void syncPlayers()
     {
         MyTCPServer.sendObjectToClients(
             Messages.Server.MultiplayerManager.ConnectedPlayers.syncConnectedPlayers,
@@ -255,7 +255,7 @@ public static class TCPMessageHandlerServer
         );
     }
 
-    private static void syncAvailableSlaves()
+    public static void syncAvailableSlaves()
     {
         MyTCPServer.sendObjectToClients(
             Messages.Server.MultiplayerSlaveMarket.AvailableSlaves.syncAvailableSlaves,
