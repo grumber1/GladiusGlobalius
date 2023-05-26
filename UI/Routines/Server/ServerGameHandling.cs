@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class ServerGameHandling : MonoBehaviour
 {
-    public GameObject DailyRoutineServerGO;
-
-    void Update()
+    void FixedUpdate()
     {
         checkForNextDay();
     }
@@ -32,8 +30,7 @@ public class ServerGameHandling : MonoBehaviour
                     connectedPlayer.readyForNextRound = false;
                 }
             );
-            DailyRoutineServerGO.SetActive(false);
-            DailyRoutineServerGO.SetActive(true);
+            fillSlaveMarketAndSyncWithPlayers();
 
             MultiplayerManagerServer.day += 1;
             MyTCPServer.sendMessageToClients(
@@ -41,5 +38,26 @@ public class ServerGameHandling : MonoBehaviour
                 MultiplayerManagerServer.day + ""
             );
         }
+    }
+
+    private void fillSlaveMarketAndSyncWithPlayers()
+    {
+        MultiplayerSlaveMarketServer.availableSlaves.Clear();
+        for (int i = 0; i < 5; i++)
+        {
+            Gladiator gladiator = Methods.createNewGladiator(
+                GladiatorNameGenerator.generateGladiatorName(),
+                75,
+                10,
+                Weapons.fist,
+                Weapons.knife
+            );
+            MultiplayerSlaveMarketServer.availableSlaves.Add(gladiator);
+        }
+
+        MyTCPServer.sendObjectToClients(
+            Messages.Server.MultiplayerSlaveMarket.AvailableSlaves.syncAvailableSlaves,
+            MultiplayerSlaveMarketServer.availableSlaves
+        );
     }
 }

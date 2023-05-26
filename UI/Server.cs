@@ -9,9 +9,7 @@ public class Server : MonoBehaviour
 {
     public GameObject ServerGO;
     public GameObject GameGO;
-    public GameObject DailyRoutineServerGO;
     public GameObject ServerGameHandlingGO;
-    public GameObject startOfANewGame;
     public TMP_Text terminal;
     public TMP_Text serverInfo;
     public double connectedPlayersCount;
@@ -20,8 +18,8 @@ public class Server : MonoBehaviour
 
     void Update()
     {
-        updateTerminal();
-        updateServerInfo();
+        // updateTerminal();
+        // updateServerInfo();
     }
 
     public void onClickStartGame()
@@ -30,9 +28,7 @@ public class Server : MonoBehaviour
             Messages.Server.MultiplayerManager.StartGameButton.set,
             "true"
         );
-        startOfANewGame.SetActive(true);
         ServerGameHandlingGO.SetActive(true);
-        DailyRoutineServerGO.SetActive(true);
     }
 
     private void updateTerminal()

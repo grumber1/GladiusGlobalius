@@ -33,9 +33,11 @@ public class Multiplayer : MonoBehaviour
 
     public void onClickHostGame()
     {
-        Methods.switchScreen(MultiplayerGO, ServerGO);
+        //Methods.switchScreen(MultiplayerGO, ServerGO);
         MyTCPServer.localIp = localIps[hostIpDropdown.value];
+        MultiplayerManagerClient.isServer = true;
         startMyTCPServerListenerThread();
+        onClickJoinGame();
     }
 
     public void onClickJoinGame()

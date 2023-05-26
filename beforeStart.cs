@@ -12,9 +12,7 @@ public class beforeStart : MonoBehaviour
     public GameObject SlaveMarketGO;
     public GameObject OwnedGladiatorsGO;
     public GameObject DailyRoutineClientGO;
-    public GameObject DailyRoutineServerGO;
     public GameObject ServerGameHandlingGO;
-    public GameObject StartOfANewGameGO;
 
     void Awake()
     {
@@ -26,9 +24,7 @@ public class beforeStart : MonoBehaviour
         SlaveMarketGO.SetActive(false);
         OwnedGladiatorsGO.SetActive(false);
         DailyRoutineClientGO.SetActive(false);
-        DailyRoutineServerGO.SetActive(false);
         ServerGameHandlingGO.SetActive(false);
-        StartOfANewGameGO.SetActive(false);
     }
 
     void Start() { }

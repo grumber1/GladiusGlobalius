@@ -8,6 +8,8 @@ public class Lobby : MonoBehaviour
 {
     public GameObject LobbyGO;
     public GameObject GameGO;
+    public GameObject ServerGO;
+    public GameObject ServerGameHandlingGO;
     public TMP_Text connectedPlayersText;
 
     void Update()
@@ -16,6 +18,19 @@ public class Lobby : MonoBehaviour
         if (MultiplayerManagerClient.startGameButton == true)
         {
             Methods.switchScreen(LobbyGO, GameGO);
+        }
+    }
+
+    public void onClickStartGame()
+    {
+        if (MultiplayerManagerClient.isServer == true)
+        {
+            MyTCPServer.sendMessageToClients(
+                Messages.Server.MultiplayerManager.StartGameButton.set,
+                "true"
+            );
+            ServerGO.SetActive(true);
+            ServerGameHandlingGO.SetActive(true);
         }
     }
 
