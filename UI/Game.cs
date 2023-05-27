@@ -6,8 +6,9 @@ using TMPro;
 
 public class Game : MonoBehaviour
 {
-    public GameObject SlaveMarketGO;
+    public GameObject BuildingsGO;
     public GameObject OwnedGladiatorsGO;
+    public GameObject SlaveMarketGO;
     public GameObject DailyRoutineClientGO;
     public GameObject FadeImageGO;
     public TMP_Text playerDetailsText;
@@ -27,16 +28,22 @@ public class Game : MonoBehaviour
         dayText.text = "Day: " + MultiplayerManagerClient.day;
     }
 
-    public void onClickSlaveMarket()
+    public void onClickBuildings()
     {
-        SlaveMarketGO.SetActive(true);
-        OwnedGladiatorsGO.SetActive(false);
+        setAllOpenWindowsInactive();
+        BuildingsGO.SetActive(true);
     }
 
     public void onClickGladiators()
     {
+        setAllOpenWindowsInactive();
         OwnedGladiatorsGO.SetActive(true);
-        SlaveMarketGO.SetActive(false);
+    }
+
+    public void onClickSlaveMarket()
+    {
+        setAllOpenWindowsInactive();
+        SlaveMarketGO.SetActive(true);
     }
 
     public void onClickNextDay()
@@ -48,6 +55,13 @@ public class Game : MonoBehaviour
             Messages.Client.MultiplayerManager.ConnectedPlayers.syncPlayer,
             MultiplayerManagerClient.player
         );
+    }
+
+    private void setAllOpenWindowsInactive()
+    {
+        BuildingsGO.SetActive(false);
+        OwnedGladiatorsGO.SetActive(false);
+        SlaveMarketGO.SetActive(false);
     }
 
     private void checkForNextDay()

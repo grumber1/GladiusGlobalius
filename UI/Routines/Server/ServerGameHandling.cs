@@ -74,7 +74,9 @@ public class ServerGameHandling : MonoBehaviour
         MultiplayerManagerServer.connectedPlayers.ForEach(
             (connectedPlayer) =>
             {
-                connectedPlayer.gold += (int)(100 + 100 * connectedPlayer.mine.bonusInPercent);
+                connectedPlayer.gold += (int)(
+                    100 + 100 * connectedPlayer.playerBuildings.mine.bonusInPercent
+                );
             }
         );
         TCPMessageHandlerServer.syncPlayers();

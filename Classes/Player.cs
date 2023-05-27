@@ -11,9 +11,7 @@ public class Player
     public int gold;
     public List<Gladiator> ownedGladiators = new List<Gladiator>();
     public bool readyForNextRound = false;
-    public Building mine = Buildings.mineLVL1;
-
-    // public Crew crew = new Crew();
+    public PlayerBuildings playerBuildings = new PlayerBuildings();
 
     public Player() { }
 

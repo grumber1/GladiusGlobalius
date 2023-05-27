@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class beforeStart : MonoBehaviour
@@ -9,8 +7,9 @@ public class beforeStart : MonoBehaviour
     public GameObject LobbyGO;
     public GameObject GameGO;
     public GameObject ServerGO;
-    public GameObject SlaveMarketGO;
+    public GameObject OwnedBuildingsGO;
     public GameObject OwnedGladiatorsGO;
+    public GameObject SlaveMarketGO;
     public GameObject DailyRoutineClientGO;
     public GameObject ServerGameHandlingGO;
 
@@ -21,13 +20,10 @@ public class beforeStart : MonoBehaviour
         LobbyGO.SetActive(false);
         GameGO.SetActive(false);
         ServerGO.SetActive(false);
-        SlaveMarketGO.SetActive(false);
+        OwnedBuildingsGO.SetActive(false);
         OwnedGladiatorsGO.SetActive(false);
+        SlaveMarketGO.SetActive(false);
         DailyRoutineClientGO.SetActive(false);
         ServerGameHandlingGO.SetActive(false);
     }
-
-    void Start() { }
-
-    void Update() { }
 }

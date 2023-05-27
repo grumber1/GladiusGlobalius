@@ -8,6 +8,7 @@ public class Building
     public string name;
     public int level;
     public float bonusInPercent;
+    public int upgradePrice;
 
     public Building() { }
 
@@ -17,5 +18,6 @@ public class Building
         this.name = newName;
         this.level = newLevel;
         this.bonusInPercent = ((this.level - 1) * 2) / 100;
+        this.upgradePrice = this.level * 1000;
     }
 }

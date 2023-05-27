@@ -5,13 +5,13 @@ using UnityEngine;
 
 public class Weapon
 {
-    public double damage;
     public string name;
+    public int damage;
 
     public Weapon() { }
 
     //Constructor
-    public Weapon(string newName, double newDamage)
+    public Weapon(string newName, int newDamage)
     {
         this.name = newName;
         this.damage = newDamage;
